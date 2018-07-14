@@ -17,7 +17,7 @@ The year is 2018. I haven't worked in a strictly C++ ecosystem for nearly a deca
 
 Each of these development components can be broken down in great detail, but IDEs and build tools like Apache Maven or Apache Ant (with Ivy) dominate the landscape of these operations, along with fundamental tools like Git and Jenkins.
 
-So imagine my surprise, developing in C++ in a long-term project running on RedHat 7, to find that the old standby "make" is still the standard, and to realize that this comes up very short. 
+So imagine my surprise, returning to developing in C++ in a long-term project running on RedHat 7, to find that the old standby "make" is still the standard, and to realize that this comes up very short. 
 
 ## requirements
 What I need is to be able to start a project and go:
@@ -25,13 +25,15 @@ What I need is to be able to start a project and go:
 * Build my projects, keeping the object files and targets in a separate directory from the sources (so I can organize my sources intelligently).
 * Minimal structural requirements (sources must be organized in a flat directory tree), use other scripting structures to support more complex project hierarchies.
 * Efficiency, using threaded operation where possible.
-* Relatively platform agnostic (I'm focused on g++ right now). 
+* Relatively platform agnostic (I'm focused on g++ right now - developing for RedHat7, Ubuntu, Debian on Raspberry Pi, MacOS, and Cygwin on Windows). 
 * Support building and run one or more tests, along with the actual target application(s). 
 * Use modern standards for configurations (JSON).
 *  
 
+## rant
 It's perhaps a conversation for another day, but there is no IDE that fully delivers for C++ development in Unix environments. Eclipse with CDT is highly unstable, unfinished, and just not up to snuff when compared to state-of-the-art Java IDEs. Visual Studio Code doesn't do Intellisense with C++ in a useful way, and even my trusty IntelliJ delivers CLion, which only works for a specific type of pipeline. MacOS requires that debuggers are signed by the App Store, so CLion is the only GDB-based solution that works on that platform. XCode, while a staple of MacOS development, has a fundamentally broken windowing model, and the clang toolkit they ship is well behind the C++ standard, or the freely available clang package.
 
+To be clear, I'll acknowledge that "make" works and works well - when you have configured the makefile for your needs. But the reality is that there is no easy start to using "make". There are a few good "general purpose" C++ makefiles if you hunt around on StackOverflow, but you are really on your own to get off the ground if you don't already have a makefile. You have to learn "make" just like any other form of programming language, and once you get past the basic capabilities of checking dependencies, "make" gets hard to use. You quickly find yourself wishing you could just write a shell script, instead.
 
 The "state of the art" is CMake, a tool with an obtuse syntax of its own that builds hyper-complex makefiles for you, and loosely integrates a relatively small ecosystem of testing tools. 
 
