@@ -1,4 +1,40 @@
 # build.pl
+## about
+The goal is to effectively develop and test a project in C++ without being tied to a specific development platform.
+
+The key word in that goal is "effectively".
+
+The year is 2018. I haven't worked in a strictly C++ ecosystem for nearly a decade. In that time, I have been working in Java, C#, and Javascript, among a host of other less popular languages. All of them have mature development capabilities that revolve around a de facto standard sequence of events roughly matching:
+* check-out project files
+* modify sources
+* resolve dependencies
+* build
+* run unit tests
+* debug
+* check-in changed project files
+* run integration tests
+* deploy
+
+Each of these development components can be broken down in great detail, but IDEs and build tools like Apache Maven or Apache Ant (with Ivy) dominate the landscape of these operations, along with fundamental tools like Git and Jenkins.
+
+So imagine my surprise, developing in C++ in a long-term project running on RedHat 7, to find that the old standby "make" is still the standard, and to realize that this comes up very short. 
+
+## requirements
+What I need is to be able to start a project and go:
+* Zero configuration required to start, add configuration only as needed to support increaded project complexity. 
+* Build my projects, keeping the object files and targets in a separate directory from the sources (so I can organize my sources intelligently).
+* Minimal structural requirements (sources must be organized in a flat directory tree), use other scripting structures to support more complex project hierarchies.
+* Efficiency, using threaded operation where possible.
+* Relatively platform agnostic (I'm focused on g++ right now). 
+* Support building and run one or more tests, along with the actual target application(s). 
+* Use modern standards for configurations (JSON).
+*  
+
+It's perhaps a conversation for another day, but there is no IDE that fully delivers for C++ development in Unix environments. Eclipse with CDT is highly unstable, unfinished, and just not up to snuff when compared to state-of-the-art Java IDEs. Visual Studio Code doesn't do Intellisense with C++ in a useful way, and even my trusty IntelliJ delivers CLion, which only works for a specific type of pipeline. MacOS requires that debuggers are signed by the App Store, so CLion is the only GDB-based solution that works on that platform. XCode, while a staple of MacOS development, has a fundamentally broken windowing model, and the clang toolkit they ship is well behind the C++ standard, or the freely available clang package.
+
+
+The "state of the art" is CMake, a tool with an obtuse syntax of its own that builds hyper-complex makefiles for you, and loosely integrates a relatively small ecosystem of testing tools. 
+
 ## build configuration files:
 build configuration files in json format, "build.json", are read at multiple levels. the
 first default is in the build script binary directory and contains global defaults. the
@@ -9,7 +45,8 @@ can be specified at the root config level, and overridden at the lower levels if
 necessary, possibly using the parent value in its redefinition. configuration variables
 can also be redefined at the command line.
 
-           example build.json:
+example build.json:
+
            {
                "type": "library",
                "dependencies":[],
