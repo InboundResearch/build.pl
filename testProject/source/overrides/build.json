@@ -1,0 +1,9 @@
+{
+    "types": {
+        "application": {
+            "compilerOptions": "$compilerOptions -Isource/common",
+            "dependerOptions": "$dependerOptions -Isource/common",
+            "linkerOptions": "$linkerOptions -L$buildPath/common/$configuration -lcommon"
+        }
+    }
+}
