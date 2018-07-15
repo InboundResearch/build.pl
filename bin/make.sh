@@ -47,6 +47,12 @@ if [ "$#" -gt 0 ]; then
                 shouldConfiguration="release";
                 shouldBuild=1;
                 ;;
+            all)
+                shouldBuild=1;
+                shouldRun=0;
+                shouldTarget="*";
+                shouldConfiguration="*";
+                ;;
             TEST)
                 # a special target for "clean build debug test run"
                 if [ -d "$sourceDir/test" ]; then
