@@ -1,4 +1,9 @@
 # build.pl
+## quick-start
+build.pl is an easy to use perl script that does what "make" does, but without any configuration needed. If you just want to throw down a quick command line program, create a directory that contains a "source/<project>" directory with your *.cpp file(s) in it, and then run build.pl. The default build context supplies debug and release configurations, and will automatically build your project.
+
+This structure is natural if you create project in GitHub, and is probably relatively familiar to users of Apache Maven (mvn).
+
 ## about
 The goal is to effectively develop and test a project in C++ without being tied to a specific development platform.
 
@@ -28,15 +33,26 @@ What I need is to be able to start a project and go:
 * Relatively platform agnostic (I'm focused on g++ right now - developing for RedHat7, Ubuntu, Debian on Raspberry Pi, MacOS, and Cygwin on Windows). 
 * Support building and run one or more tests, along with the actual target application(s). 
 * Use modern standards for configurations (JSON).
-*  
 
 ## rant
 It's perhaps a conversation for another day, but there is no IDE that fully delivers for C++ development in Unix environments. Eclipse with CDT is highly unstable, unfinished, and just not up to snuff when compared to state-of-the-art Java IDEs. Visual Studio Code doesn't do Intellisense with C++ in a useful way, and even my trusty IntelliJ delivers CLion, which only works for a specific type of pipeline. MacOS requires that debuggers are signed by the App Store, so CLion is the only GDB-based solution that works on that platform. XCode, while a staple of MacOS development, has a fundamentally broken windowing model, and the clang toolkit they ship is well behind the C++ standard, or the freely available clang package.
 
-To be clear, I'll acknowledge that "make" works and works well - when you have configured the makefile for your needs. But the reality is that there is no easy start to using "make". There are a few good "general purpose" C++ makefiles if you hunt around on StackOverflow, but you are really on your own to get off the ground if you don't already have a makefile. You have to learn "make" just like any other form of programming language, and once you get past the basic capabilities of checking dependencies, "make" gets hard to use. You quickly find yourself wishing you could just write a shell script, instead.
+To be clear, I'll acknowledge that "make" works and works well - when you have configured the makefile for your needs. But the reality is that there is no easy start to using "make". There are a few good "general purpose" C++ makefiles if you hunt around on StackOverflow, but you are really on your own if you don't already have a makefile. You have to learn "make" just like any other form of programming language, and once you get past the basic capabilities of checking dependencies, "make" gets hard to use. You quickly find yourself wishing you could just write a shell script, instead.
 
-The "state of the art" is CMake, a tool with an obtuse syntax of its own that builds hyper-complex makefiles for you, and loosely integrates a relatively small ecosystem of testing tools. 
+The "state of the art" is CMake, a tool with an obtuse syntax of its own that builds hyper-complex makefiles for you, and loosely integrates a relatively small ecosystem of testing tools. It's a good start, but is more meant to solve the portability problem than the build problem.
 
+
+## prerequisites
+build.pl uses ... Perl ... so you will need that installed. It's tested on v. 5.16 and up, but does require threads. On MacOS, I use perlbrew, which installs an unthreaded version of perl by default. You will need to install it with a command line like:
+  
+    > perlbrew install --as perl-5.16.0t -Dusethreads perl-5.16.0
+
+Once Perl is installed, you will also need to use CPAN to install the JSON module:
+
+    > cpan JSON
+    
+I use a cloned copy of the build.pl repository, and add build.pl/bin to my path. You can "install" it however you like.
+ 
 ## build configuration files:
 build configuration files in json format, "build.json", are read at multiple levels. the
 first default is in the build script binary directory and contains global defaults. the

@@ -52,9 +52,14 @@ Context::addTypeNamed("project", $ContextType{VALUES}, Context::concatenateNamed
 my $targets = {};
 my $targetPrefix = "#";
 my $sourcePath = Context::confType ("project", $ContextType{VALUES}, "sourcePath");
+
 if (opendir(SOURCE_PATH, $sourcePath)) {
     while (my $target = readdir(SOURCE_PATH)) {
+        # skip unless $target is a non-hidden directory, that is not also the build directory
         next unless (($target !~ /^\./) && (-d "$sourcePath/$target"));
+        next if (abs_path("$sourcePath/$target") eq abs_path(Context::confType ("project", $ContextType{VALUES}, "buildPath")));
+
+        # load the target context
         Context::load ("$targetPrefix$target", "$sourcePath/$target/");
         my $targetContext = Context::concatenateNamed ("project-" . $ContextType{VALUES}, "$targetPrefix$target-" . $ContextType{VALUES});
         $targetContext->{target} = $target;

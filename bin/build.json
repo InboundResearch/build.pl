@@ -1,6 +1,6 @@
 {
     "values": {
-        "sourcePath": "source",
+        "sourcePath": ".",
         "buildPath": "target",
         "objectsPath": "objects",
         "sourceExtension": ".cpp",
@@ -9,7 +9,7 @@
         "target": "*",
         "dependencies": [],
         "type": "application",
-        "configuration": "*",
+        "configuration": "debug",
         "verbose": 1,
         "sourceFullPath": "$sourcePath/$target",
         "objectsFullPath": "$buildPath/$target/$configuration/$objectsPath",
