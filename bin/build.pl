@@ -40,10 +40,12 @@ foreach my $argument (@ARGV) {
 Context::addTypeNamed("commandline", $ContextType{VALUES}, $commandLineContext);
 
 # put them all together and replace the project-values context
-Context::addTypeNamed("project", $ContextType{VALUES}, Context::concatenateNamed (
-    "root-" . $ContextType{VALUES},
-    "project-" . $ContextType{VALUES},
-    "commandline-" . $ContextType{VALUES})
+Context::addTypeNamed("project", $ContextType{VALUES},
+    Context::concatenateNamed (
+        "root-" . $ContextType{VALUES},
+        "project-" . $ContextType{VALUES},
+        "commandline-" . $ContextType{VALUES}
+    )
 );
 
 #---------------------------------------------------------------------------------------------------
@@ -59,10 +61,9 @@ if (opendir(SOURCE_PATH, $sourcePath)) {
         next unless (($target !~ /^\./) && (-d "$sourcePath/$target"));
         next if (abs_path("$sourcePath/$target") eq abs_path(Context::confType ("project", $ContextType{VALUES}, "buildPath")));
 
-        # load the target context
+        # load the target context to get the dependencies
         Context::load ("$targetPrefix$target", "$sourcePath/$target/");
         my $targetContext = Context::concatenateNamed ("project-" . $ContextType{VALUES}, "$targetPrefix$target-" . $ContextType{VALUES});
-        $targetContext->{target} = $target;
         $targets->{$target} = $targetContext;
     }
     closedir(SOURCE_PATH);

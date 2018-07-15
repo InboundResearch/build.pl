@@ -9,8 +9,22 @@ UNKNOWN="UNKNOWN";
 shouldClean=0;
 shouldBuild=0;
 shouldRun=0;
-shouldTarget="$UNKNOWN";
 shouldConfiguration="debug";
+sourceDir=$(getcontextvars.pl sourcePath);
+
+# the default target is "test", but if it's not present, find the first available project
+if [ -d "$sourceDir/test" ]; then
+    # test if it exists
+    shouldTarget="test";
+else
+    projects=($(getcontextvars.pl projects));
+    if [ ${#projects[@]} -gt "0" ]; then
+        shouldTarget="${projects[0]}";
+        #echo "TARGET=$shouldTarget";
+    else
+        shouldTarget="$UNKNOWN";
+    fi
+fi
 
 if [ "$#" -gt 0 ]; then
     for target in "$@"; do
@@ -27,13 +41,15 @@ if [ "$#" -gt 0 ]; then
                 ;;
             debug)
                 shouldConfiguration="debug";
+                shouldBuild=1;
                 ;;
             release)
                 shouldConfiguration="release";
+                shouldBuild=1;
                 ;;
             TEST)
                 # a special target for "clean build debug test run"
-                if [ -d "source/test" ]; then
+                if [ -d "$sourceDir/test" ]; then
                     shouldClean=1;
                     shouldBuild=1;
                     shouldRun=1;
@@ -44,7 +60,7 @@ if [ "$#" -gt 0 ]; then
                 fi
                 ;;
             *)
-                if [ -d "source/$target" ]; then
+                if [ -d "$sourceDir/$target" ]; then
                     shouldBuild=1;
                     shouldTarget="$target";
                 else
@@ -54,13 +70,9 @@ if [ "$#" -gt 0 ]; then
         esac
     done
 else
-    # default to build and run test in debug mode (no clean)
-    if [ -d "source/test" ]; then
-        shouldConfiguration="debug";
-        shouldTarget="test";
-        shouldBuild=1;
-        shouldRun=1;
-    fi
+    # default to build and run in debug mode (no clean)
+    shouldBuild=1;
+    shouldRun=1;
 fi
 
 if [ "$shouldClean" -eq 1 ]; then
@@ -69,7 +81,7 @@ if [ "$shouldClean" -eq 1 ]; then
 fi
 
 if [ "$shouldTarget" != "$UNKNOWN" ]; then
-    if [ "$shouldBuild" -eq 1 ]; then
+    if [ "$shouldBuild" -eq 1 ] || [ "$shouldRun" -eq 1 ]; then
         build.pl target="$shouldTarget" configuration="$shouldConfiguration";
     fi
 
@@ -79,6 +91,6 @@ if [ "$shouldTarget" != "$UNKNOWN" ]; then
     fi
 else
     if [ "$shouldBuild" -eq 1 ] || [ "$shouldRun" -eq 1 ]; then
-        echo "no target specified";
+        echo "No target specified";
     fi
 fi
