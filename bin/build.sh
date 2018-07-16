@@ -13,6 +13,7 @@ shouldBuild=0;
 shouldRun=0;
 shouldConfiguration="debug";
 sourceDir=$(getcontextvars.pl sourcePath);
+targetDir=$(getcontextvars.pl buildPath);
 
 # the default target is "test", but if it's not present, find the first available project
 if [ -d "$sourceDir/test" ]; then
@@ -87,7 +88,7 @@ fi
 
 if [ "$shouldClean" -eq 1 ]; then
     echo "clean";
-    rm -rf target;
+    rm -rf $targetDir;
 fi
 
 if [ "$shouldTarget" != "$UNKNOWN" ]; then
@@ -96,9 +97,11 @@ if [ "$shouldTarget" != "$UNKNOWN" ]; then
     fi
 
     if [ "$shouldRun" -eq 1 ]; then
-        # linux needs to set the shared library path
-        LD_LIBRARY_PATH=target/$shouldTarget/$shouldConfiguration:$LD_LIBRARY_PATH;
-        target/$shouldTarget/$shouldConfiguration/$shouldTarget;
+        if [ -x "$targetDir/$shouldTarget/$shouldConfiguration/$shouldTarget" ]; then
+            # linux needs to set the shared library path
+            LD_LIBRARY_PATH=$targetDir/$shouldTarget/$shouldConfiguration:$LD_LIBRARY_PATH;
+            $targetDir/$shouldTarget/$shouldConfiguration/$shouldTarget 2> >(tee $targetDir/$shouldTarget/$shouldConfiguration/$shouldTarget.stderr) ;
+        fi
     fi
 else
     if [ "$shouldBuild" -eq 1 ] || [ "$shouldRun" -eq 1 ]; then

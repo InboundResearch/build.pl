@@ -265,7 +265,9 @@ for my $target (@$targetsInDependencyOrder) {
             if ((!-e $targetContext->{outputFile}) || ($linkNeeded & $compilationSuccessful)) {
                 my $link = $targetContext->{linker} . " " . $targetContext->{linkerOptions};
                 print STDERR "    LINK: $link\n";
-                system($link);
+
+                # need to stop the script if this fails
+                next unless (system($link) == 0);
             }
 
             # check to see if we need to copy dependencies
