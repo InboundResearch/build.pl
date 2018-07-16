@@ -1,6 +1,6 @@
 {
     "values": {
-        "sourcePath": "source",
+        "sourcePath": "src",
         "target": "test"
     }
 }

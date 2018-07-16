@@ -5,6 +5,6 @@
 using namespace std;
 
 int main (int argc, char** argv) {
-	cerr << "Two!" << endl;
+	cerr << "Simple!" << endl;
 	return EXIT_SUCCESS;
 }

@@ -3,6 +3,8 @@
 # basic "make" replacement using build.pl behind the scenes to do the build - this is not intended
 # to be a comprehensive make replacement, just a helper script to add a few other capabilities that
 # build.pl doesn't cover
+
+# exit automatically if anything fails
 set -e
 
 UNKNOWN="UNKNOWN";
@@ -63,6 +65,7 @@ if [ "$#" -gt 0 ]; then
                     shouldConfiguration="debug";
                 else
                     echo "Unknown target (test)";
+                    exit 1;
                 fi
                 ;;
             *)
@@ -71,6 +74,7 @@ if [ "$#" -gt 0 ]; then
                     shouldTarget="$target";
                 else
                     echo "Unknown target ($target)";
+                    exit 1;
                 fi
                 ;;
         esac
@@ -98,5 +102,6 @@ if [ "$shouldTarget" != "$UNKNOWN" ]; then
 else
     if [ "$shouldBuild" -eq 1 ] || [ "$shouldRun" -eq 1 ]; then
         echo "No target specified";
+        exit 1;
     fi
 fi

@@ -1,10 +1,50 @@
 # build.pl
-## quick-start
-build.pl is an easy to use perl script that does what "make" does, but without any configuration needed. If you just want to throw down a quick command line program, create a directory that contains a "source/<project>" directory with your *.cpp file(s) in it, and then run build.pl. The default build context supplies debug and release configurations, and will automatically build your project.
+build.pl is an easy to use perl script that does what "make" does for C++ projects, but without any configuration needed. 
 
-This structure is natural if you create project in GitHub, and is probably relatively familiar to users of Apache Maven (mvn).
+## 1. THE BASICS
+### 1.1. installation
+The specifics of where to install a script folder and how to add it to your path are left to the user, but you will need to add the ".../build.pl/bin" directory to your path.
 
-## about
+build uses Bash, and build.pl uses Perl, so you will need those installed. It's tested on Perl v.5.16 and up, but requires a version with threads support, and the JSON module needs to be installed. If it's missing, you can install it with:
+
+    > cpan JSON
+
+#### 1.1.1. MacOS
+On MacOS, I use perlbrew, which installs an unthreaded version of perl by default. You will need to install a threaded version with a command line like:
+  
+    > perlbrew install --as perl-5.16.0t -Dusethreads perl-5.16.0
+
+Once Perl is installed, you will need to use CPAN to install the JSON module:
+
+    > cpan JSON
+    
+I also use homebrew to install the gnu version of grep (which supports Perl-like regular expressions with the -P option). Be sure to follow the directions for 
+
+    > brew install grep
+
+### 1.2. quick-start
+To make a basic C++ program to be compiled as an application, create a directory for your project (we'll call this the "parent" directory). Inside the parent directory, create a directory named "<your project>", and put your *.cpp file(s) in it. From a command line inside the parent directory, run `build`. The default build context will automatically compile all of the .cpp files in your project directory in a debug configuration, link them into an application named "<your project>", and then try to run the application. The default output directory is "target/<your project>". See the project under "examples/simple".
+
+### 1.3. adding tests
+Testing is a broad topic, and the build.pl approach is not to dictate the methods of testing. However, an application target in your project called "test" is treated as special, and will be the default target if it is present. See the project under "examples/simple-with-test".
+
+The sample project uses a very basic TEST_CASE macro to build test cases that are automatically run by the program prior to calling the "main" function. I use this structure extensively in my own coding, and it has proven to be a valuable method of building unit tests without a lot of complexity, but you should be able to easily integrate other unit testing frameworks like Boost or CTest if you prefer.
+
+### 1.4. using a more complex directory structure
+If you are familiar with Java development with Apache Maven, you might prefer to put your code into a "src" directory. In order to achieve this, you will have to create a build.json file in your project's parent directory, and you will have to set a value to specify the source path name (the default value is "."). You only to to specify context variables that you want to override, so in this case it can be a very simple file:
+
+    {
+        "values": {
+            "sourcePath": "src"
+        }
+    }
+
+Note that build.pl doesn't support a deeply nested project structure like you find in a Java project, but this will allow you to organize your code into sub projects, break them up into libraries and applications, and include a test program. See the project under "examples/complex" to get an idea of how this can be done.
+
+## 2. GOING DEEP
+Up to this point, we've mostly been talking about how to use the "build" shell script to build your project, but you can skip this pseudo-make tool and use build.pl directly. 
+
+### 2.1. about
 The goal is to effectively develop and test a project in C++ without being tied to a specific development platform.
 
 The key word in that goal is "effectively".
@@ -24,7 +64,7 @@ Each of these development components can be broken down in great detail, but IDE
 
 So imagine my surprise, returning to developing in C++ in a long-term project running on RedHat 7, to find that the old standby "make" is still the standard, and to realize that this comes up very short. 
 
-## requirements
+### 2.2. requirements
 What I need is to be able to start a project and go:
 * Zero configuration required to start, add configuration only as needed to support increaded project complexity. 
 * Build my projects, keeping the object files and targets in a separate directory from the sources (so I can organize my sources intelligently).
@@ -34,83 +74,63 @@ What I need is to be able to start a project and go:
 * Support building and run one or more tests, along with the actual target application(s). 
 * Use modern standards for configurations (JSON).
 
-## rant
+### 2.3. rant
 It's perhaps a conversation for another day, but there is no IDE that fully delivers for C++ development in Unix environments. Eclipse with CDT is highly unstable, unfinished, and just not up to snuff when compared to state-of-the-art Java IDEs. Visual Studio Code doesn't do Intellisense with C++ in a useful way, and even my trusty IntelliJ delivers CLion, which only works for a specific type of pipeline. MacOS requires that debuggers are signed by the App Store, so CLion is the only GDB-based solution that works on that platform. XCode, while a staple of MacOS development, has a fundamentally broken windowing model, and the clang toolkit they ship is well behind the C++ standard, or the freely available clang package.
 
-To be clear, I'll acknowledge that "make" works and works well - when you have configured the makefile for your needs. But the reality is that there is no easy start to using "make". There are a few good "general purpose" C++ makefiles if you hunt around on StackOverflow, but you are really on your own if you don't already have a makefile. You have to learn "make" just like any other form of programming language, and once you get past the basic capabilities of checking dependencies, "make" gets hard to use. You quickly find yourself wishing you could just write a shell script, instead.
+I'll acknowledge that "make" works and works well - when you have configured the makefile for your needs. But the reality is that there is no easy start to using "make". There are a few good "general purpose" C++ makefiles if you hunt around on StackOverflow, but you are really on your own if you don't already have a makefile. You have to learn "make" just like any other form of programming language, and once you get past the basic capabilities of checking dependencies, "make" gets hard to use. You quickly find yourself wishing you could just write a shell script, instead.
 
 The "state of the art" is CMake, a tool with an obtuse syntax of its own that builds hyper-complex makefiles for you, and loosely integrates a relatively small ecosystem of testing tools. It's a good start, but is more meant to solve the portability problem than the build problem.
 
 
-## prerequisites
-build.pl uses ... Perl ... so you will need that installed. It's tested on v. 5.16 and up, but does require threads. On MacOS, I use perlbrew, which installs an unthreaded version of perl by default. You will need to install it with a command line like:
-  
-    > perlbrew install --as perl-5.16.0t -Dusethreads perl-5.16.0
-
-Once Perl is installed, you will also need to use CPAN to install the JSON module:
-
-    > cpan JSON
-    
-I use a cloned copy of the build.pl repository, and add build.pl/bin to my path. You can "install" it however you like.
- 
-## build configuration files:
-build configuration files in json format, "build.json", are read at multiple levels. the
-first default is in the build script binary directory and contains global defaults. the
-second default is at the root of the project directory, and the final build
-configuration can be found inside each individual target. each variable requested is
-processed to the lowest level configuration in which it is found, so that most defaults
-can be specified at the root config level, and overridden at the lower levels if
-necessary, possibly using the parent value in its redefinition. configuration variables
-can also be redefined at the command line.
+### 2.4. build configuration files:
+Build configuration files in json format, called "build.json", are read at multiple levels. The first default is in the build script binary directory and contains global defaults. The second default is at the root of the project directory, and the final build configuration can be found inside each individual target. Each variable requested is processed to the lowest level configuration in which it is found, so that most defaults can be specified at the root config level, and overridden at the lower levels if necessary, possibly using the parent value in its redefinition. Configuration variables can also be redefined at the command line.
 
 example build.json:
 
-           {
-               "type": "library",
-               "dependencies":[],
-               "configurations": {
-                   "debug": {
-                       "compilerOptions": "-g -D_DEBUG_",
-                       "linkerOptions": ""
-                   },
-                   "release": {
-                       "compilerOptions": "-O3 -D_NDEBUG_",
-                       "linkerOptions": ""
-                   }
-               }
-           }
+    {
+        "values": {
+            "type": "staticLibrary",
+            "dependencies":[],
+        },
+        "configurations": {
+            "debug": {
+                "compilerOptions": "-g -D_DEBUG_"
+            },
+            "release": {
+                "compilerOptions": "-O3 -D_NDEBUG_"
+            }
+        }
+    }
 
-## target names:
-source directories are named for the final product name (e.g. directory "math" builds a
-library called "math". this cannot be overridden.
+### 2.5. target names:
+Source directory names are used for the final product name (e.g. directory "math" builds a target called "math"). This cannot be overridden.
 
-## variables:
-configuration variables are a "$" followed by any valid camel-case identifiers:
+### 2.6. variables:
+Configuration variables are a "$" followed by any valid camel-case identifiers:
 
 `$[a-z][A-Za-z0-9]+`
 
 configuration variables are mostly defined statically, but can be specified to be
-interpreted by a shell or by variable replacement. replacements are processed
-recursively starting with step (1) until no more substitutions are performed:
+interpreted by a shell or by variable replacement:
 
 1)  `$[name]` is a simple replacement from the current build configuration dictionary.
    if `[name]` is not a known build configuration variable, it is left unchanged. if
-   the replacement value is "*" or is not a simple scalar, it is left unchanged.
+   the replacement value is "*" or is not a simple scalar (in JSON), it is left unchanged.
 
-2)  a `$([exec])` construct replaces the string with the value returned by a shell
+2)  a `$([command])` construct replaces the string with the value returned by a shell
   executing the given command.
 
-3)  a `?([ifdef]:[ifndef])` structure in a variable value declares a conditional
+3)  TODO: a `?([ifdef]:[ifndef])` structure in a variable value declares a conditional
    definition, where the ifdef side is executed if the variable is already defined, and
    the ifndef side is executed if it is not. omitting the ":" is valid if there is no
    ifndef. omitting the ifdef is equivalent to un-defining the value, so erasing a
    setting is "?()". a simple "$" before the ":" is sufficient to indicate the existing
    value, but complex redefinitions should use the variable name normally.
 
-4)  a `!` at the beginning of a variable value declares it to be "final", and no further
+4)  TODO: a `!` at the beginning of a variable value declares it to be "final", and no further
    overrides will be processed.
 
-## build configuration hierarchy:
+## 2.7. build configuration hierarchy:
 when a new build configuration (N) context is opened, it is concatenated with the
 existing top level build configuration (E), to produce a resulting build configuration
 context (R), as follows:
@@ -130,7 +150,7 @@ resolved using its own definitions.
 any particular concatenation of build configurations can be requested via a named
 build configuration and a new dictionary.
 
-## dependencies:
+### 2.8. dependencies:
 targets (library or application) might depend on another target being built first, so
 dependencies can be named in the array variable "dependencies". the include paths sent
 to the compiler will include the dependency directories as -I includes, and the library
@@ -139,26 +159,12 @@ paths sent to the linker will include the dependency directories as -L libs.
 another option would be to reference all external includes with a relative path,
 i.e. `#include "common/Types.h"`
 
-## command line options:
-command line options can be used to override build configuration settings. in practice,
-the only settings allowed are "buildConfigurationFileName" (which is processed before
-the project-level configuration), and "target" and "configuration" (which are processed
-after the project-level configuration). this effect is achieved by processing the
-command line build configurations both before and after the project-level configuration,
-which could lead to unexpected results if the end-user is attempting to set these three
-values in both places.
+### 2.9. command line options:
+Command line options can be used to override build configuration settings. In practice, the only settings allowed are "target" and "configuration". This effect is achieved by processing the command line opetions as a build context after the project-level context.
 
-NOTE - all other build configuration variable values are too complicated to support from
-the command line. they may be specified, but the result is undefined and unsupported,
-and might be subject to later revision.
+NOTE - other build configuration variable values are too complicated to support from the command line. They may be specified, but the result is undefined and unsupported, and might be subject to later revision.
 
-TODO: NOTE - the builder caches major configurations at the root of the "$target" directory,
-and since command line options can override cached values, passing a command line to
-change one of these values invalidates the cached configuration. running without any
-options re-uses the cached configuration, which makes command line configurations
-"sticky".
-
-## tree structure -
+### 2.10. tree structure -
 i was originally going to try to mimic a maven project and allow other languages to be 
 present (java, etc.), but decided that a separate directory is ultimately cleaner. NOTE: 
 *ALL* built files are deposited in "target", so clean builds are made by removing "target".
