@@ -210,3 +210,20 @@ target -+- (lib) -+- (config) -+- objects -+- *.o
                                +- (built)
                                +- (copied resources)
 ```
+
+## 3. TODO
+* copy resources
+* ensure runnable code when building with shared libraries in linux (this works in MacOS without any special handling)
+* figure out how to build shared libraries on cygwin, maybe have to add a "platforms" object in the context, and set that appropriately based on a `uname -s` call? something informed by this:
+```
+unameOut="$(uname -s)"
+case "${unameOut}" in
+    Linux*)     machine=Linux;;
+    Darwin*)    machine=Mac;;
+    CYGWIN*)    machine=Cygwin;;
+    MINGW*)     machine=MinGw;;
+    *)          machine="UNKNOWN:${unameOut}"
+esac
+echo ${machine}
+```
+
