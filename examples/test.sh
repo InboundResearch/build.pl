@@ -23,6 +23,7 @@ build;
 build build;
 build clean;
 build;
+LD_LIBRARY_PATH=target/test/debug:$LD_LIBRARY_PATH;
 target/test/debug/test;
 build clean common;
 build clean release run;
@@ -31,4 +32,4 @@ build clean;
 
 popd;
 
-echo "FINISHED SUCCESSFULLY";
+echo "PASS!";
