@@ -12,6 +12,7 @@ use utf8;
 # we will use multiple threads to compile the files
 use threads;
 
+use File::Copy;
 use File::Path qw(make_path);
 use File::Basename;
 use Cwd qw(abs_path);
@@ -265,6 +266,24 @@ for my $target (@$targetsInDependencyOrder) {
                 my $link = $targetContext->{linker} . " " . $targetContext->{linkerOptions};
                 print STDERR "    LINK: $link\n";
                 system($link);
+            }
+
+            # check to see if we need to copy dependencies
+            for my $dependency (@$dependencies) {
+                if ($targets->{$dependency}->{type} eq "sharedLibrary") {
+                    print STDERR "    DEPENDENCY: " . $targets->{$dependency}->{outputFile} . "\n";
+                    copy($targets->{$dependency}->{outputFile}, $targetContext->{outputPath});
+                }
+            }
+
+            # check to see if we need to copy resources
+            if (opendir(RESOURCES_PATH, $targetContext->{resourcesFullPath})) {
+                while (my $resourceFile = readdir(RESOURCES_PATH)) {
+                    next unless (($resourceFile !~ /^\./) && (-f $targetContext->{resourcesFullPath} . "/$resourceFile"));
+                    print STDERR "    RESOURCE: $resourceFile\n";
+                    copy ($targetContext->{resourcesFullPath} . "/$resourceFile", $targetContext->{outputPath});
+                }
+                closedir(RESOURCES_PATH);
             }
         } else {
             print STDERR "SKIP $target/$configuration (unknown configuration)\n";

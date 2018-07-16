@@ -1,6 +1,7 @@
 {
     "values": {
         "sourcePath": ".",
+        "resourcesPath": "resources",
         "buildPath": "target",
         "objectsPath": "objects",
         "sourceExtension": ".cpp",
@@ -12,11 +13,13 @@
         "configuration": "debug",
         "verbose": 1,
         "sourceFullPath": "$sourcePath/$target",
-        "objectsFullPath": "$buildPath/$target/$configuration/$objectsPath",
+        "resourcesFullPath": "$sourceFullPath/$resourcesPath",
+        "outputPath": "$buildPath/$target/$configuration",
+        "objectsFullPath": "$outputPath/$objectsPath",
         "sourceFile": "$sourceFullPath/$sourceBase$sourceExtension",
         "dependencyFile": "$objectsFullPath/$sourceBase$dependencyExtension",
         "objectFile": "$objectsFullPath/$sourceBase$objectExtension",
-        "linkTo": "-L$buildPath/$target/$configuration -l$target",
+        "linkTo": "-L$outputPath -l$target",
         "toInclude": "-I$sourceFullPath",
         "compiler": "$(find /usr/local/bin /usr/bin | grep -P \"\\/g\\+\\+\" | head -n 1)",
         "depender": "$compiler",
@@ -37,20 +40,20 @@
             "compilerOptions": "$compilerOptions -c $sourceFile $includes -o $objectFile",
             "dependerOptions": "$compilerOptions -MM $sourceFile $includes > $dependencyFile",
             "linkerOptions": "$linkerOptions -o $outputFile $objectsFullPath/*$objectExtension $libraries",
-            "outputFile": "$buildPath/$target/$configuration/$target"
+            "outputFile": "$outputPath/$target"
         },
         "sharedLibrary": {
             "compilerOptions": "$compilerOptions -fPIC -c $sourceFile $includes -o $objectFile",
             "dependerOptions": "$compilerOptions -MM $sourceFile $includes > $dependencyFile",
             "linkerOptions": "$linkerOptions -shared -o $outputFile $objectsFullPath/*$objectExtension",
-            "outputFile": "$buildPath/$target/$configuration/lib$target.so"
+            "outputFile": "$outputPath/lib$target.so"
         },
         "staticLibrary": {
             "compilerOptions": "$compilerOptions -c $sourceFile $includes -o $objectFile",
             "dependerOptions": "$compilerOptions -MM $sourceFile $includes > $dependencyFile",
             "linker": "$(find /usr/local/bin /usr/bin | grep -P \"\\/ar$\" | head -n 1)",
             "linkerOptions": "$linkerOptions rcs $outputFile $objectsFullPath/*$objectExtension",
-            "outputFile": "$buildPath/$target/$configuration/lib$target.a"
+            "outputFile": "$outputPath/lib$target.a"
         }
     }
 }

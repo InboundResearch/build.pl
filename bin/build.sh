@@ -96,7 +96,8 @@ if [ "$shouldTarget" != "$UNKNOWN" ]; then
     fi
 
     if [ "$shouldRun" -eq 1 ]; then
-        # linux might need to set some link loader libraries
+        # linux needs to set the shared library path
+        LD_LIBRARY_PATH=target/$shouldTarget/$shouldConfiguration:$LD_LIBRARY_PATH;
         target/$shouldTarget/$shouldConfiguration/$shouldTarget;
     fi
 else
