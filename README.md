@@ -213,7 +213,7 @@ target -+- (lib) -+- (config) -+- objects -+- *.o
 
 ## 3. TODO
 * copy resources
-* ensure runnable code when building with shared libraries in linux (this works in MacOS without any special handling)
+* ensure runnable code when building with shared libraries in linux (this works in MacOS without any special handling), possibly need a "copy dependencies" component.
 * figure out how to build shared libraries on cygwin, maybe have to add a "platforms" object in the context, and set that appropriately based on a `uname -s` call? something informed by this:
 ```
 unameOut="$(uname -s)"
