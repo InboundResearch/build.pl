@@ -15,6 +15,18 @@ build clean;
 
 popd;
 
+pushd simple-with-test;
+
+build clean;
+build;
+build build simple;
+target/simple/debug/simple;
+build clean release run;
+build clean;
+build TEST;
+
+popd;
+
 pushd complex;
 
 # clean build, everything
