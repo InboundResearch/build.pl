@@ -11,11 +11,13 @@ TEST_CASE(Test2) {
     TEST_ASSERTION(true);
 }
 
-/*
+// comment this definition to see what a test failure looks like
+#define     SKIP_FAILURE_TEST_CASE
+#ifndef     SKIP_FAILURE_TEST_CASE
 TEST_CASE(ForceFailure) {
-    TEST_ASSERTION(false);
+    TEST_XY(true, false);
 }
-*/
+#endif
 
 int main (int argc, char** argv) {
 	cerr << "TESTS COMPLETED SUCCESSFULLY!" << endl << endl;
