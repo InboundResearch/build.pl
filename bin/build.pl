@@ -267,7 +267,7 @@ for my $target (@$targetsInDependencyOrder) {
                 print STDERR "    LINK: $link\n";
 
                 # need to stop the script if this fails
-                next unless (system($link) == 0);
+                exit ($!) unless (system($link) == 0);
             }
 
             # check to see if we need to copy dependencies
@@ -279,13 +279,9 @@ for my $target (@$targetsInDependencyOrder) {
             }
 
             # check to see if we need to copy resources
-            if (opendir(RESOURCES_PATH, $targetContext->{resourcesFullPath})) {
-                while (my $resourceFile = readdir(RESOURCES_PATH)) {
-                    next unless (($resourceFile !~ /^\./) && (-f $targetContext->{resourcesFullPath} . "/$resourceFile"));
-                    print STDERR "    RESOURCE: $resourceFile\n";
-                    copy ($targetContext->{resourcesFullPath} . "/$resourceFile", $targetContext->{outputPath});
-                }
-                closedir(RESOURCES_PATH);
+            if (-d "$targetContext->{resourcesFullPath}") {
+                print STDERR "    COPY RESOURCES: $targetContext->{resourcesFullPath}\n";
+                system("rsync -qa $targetContext->{resourcesFullPath}/* $targetContext->{outputPath}");
             }
         } else {
             print STDERR "SKIP $target/$configuration (unknown configuration)\n";
