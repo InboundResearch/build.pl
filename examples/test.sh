@@ -3,7 +3,7 @@
 # exit automatically if anything fails
 set -e;
 
-pushd simple;
+pushd simple > /dev/null;
 
 build clean;
 build;
@@ -13,9 +13,9 @@ build clean release run;
 build clean;
 #build TEST;
 
-popd;
+popd > /dev/null;
 
-pushd simple-with-test;
+pushd simple-with-test > /dev/null;
 
 build clean;
 build;
@@ -25,9 +25,9 @@ build clean release run;
 build clean;
 build TEST;
 
-popd;
+popd > /dev/null;
 
-pushd complex;
+pushd complex > /dev/null;
 
 # clean build, everything
 build clean;
@@ -42,6 +42,6 @@ build clean release run;
 build TEST;
 build clean;
 
-popd;
+popd > /dev/null;
 
 echo "PASS!";

@@ -70,6 +70,7 @@ if (opendir(SOURCE_PATH, $sourcePath)) {
     closedir(SOURCE_PATH);
 } else {
     print STDERR "Can't open source directory ($sourcePath), $!\n";
+    exit ($!);
 }
 
 #---------------------------------------------------------------------------------------------------
@@ -92,6 +93,7 @@ sub traverseTargetDependencies {
         }
     } else {
         print STDERR "Unknown target: $target\n";
+        exit (1);
     }
 }
 
@@ -245,6 +247,7 @@ for my $target (@$targetsInDependencyOrder) {
             }
             else {
                 print STDERR "Can't open target source directory ($targetContext->{sourceFullPath}), $!\n";
+                exit ($!);
             }
 
             # wait for the child threads to return, we set a flag that we need to link - it's false
@@ -261,12 +264,18 @@ for my $target (@$targetsInDependencyOrder) {
             }
             $linkNeeded = $linkNeeded & $compilationSuccessful;
 
+            # exit if compilations failed
+            exit (1) if (!$compilationSuccessful);
+
             # check to see if we need to link...
             if ((!-e $targetContext->{outputFile}) || ($linkNeeded & $compilationSuccessful)) {
+                if (-e $targetContext->{outputFile}) {
+                    unlink ($targetContext->{outputFile});
+                }
                 my $link = $targetContext->{linker} . " " . $targetContext->{linkerOptions};
                 print STDERR "    LINK: $link\n";
 
-                # need to stop the script if this fails
+                # exit if link fails
                 exit ($!) unless (system($link) == 0);
             }
 
@@ -274,14 +283,14 @@ for my $target (@$targetsInDependencyOrder) {
             for my $dependency (@$dependencies) {
                 if ($targets->{$dependency}->{type} eq "sharedLibrary") {
                     print STDERR "    DEPENDENCY: " . $targets->{$dependency}->{outputFile} . "\n";
-                    copy($targets->{$dependency}->{outputFile}, $targetContext->{outputPath});
+                    exit ($!) if (copy($targets->{$dependency}->{outputFile}, $targetContext->{outputPath}) == 0);
                 }
             }
 
             # check to see if we need to copy resources
             if (-d "$targetContext->{resourcesFullPath}") {
                 print STDERR "    COPY RESOURCES: $targetContext->{resourcesFullPath}\n";
-                system("rsync -qa $targetContext->{resourcesFullPath}/* $targetContext->{outputPath}");
+                exit ($!) unless (system("rsync -qa $targetContext->{resourcesFullPath}/* $targetContext->{outputPath}") == 0);
             }
         } else {
             print STDERR "SKIP $target/$configuration (unknown configuration)\n";
