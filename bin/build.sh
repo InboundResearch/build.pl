@@ -99,7 +99,7 @@ if [ "$shouldTarget" != "$UNKNOWN" ]; then
     if [ "$shouldRun" -eq 1 ]; then
         if [ -x "$targetDir/$shouldTarget/$shouldConfiguration/$shouldTarget" ]; then
             # linux needs to set the shared library path
-            LD_LIBRARY_PATH=$targetDir/$shouldTarget/$shouldConfiguration:$LD_LIBRARY_PATH;
+            export LD_LIBRARY_PATH=$targetDir/$shouldTarget/$shouldConfiguration:$LD_LIBRARY_PATH;
             $targetDir/$shouldTarget/$shouldConfiguration/$shouldTarget 2> >(tee $targetDir/$shouldTarget/$shouldConfiguration/$shouldTarget.stderr) ;
         fi
     fi
