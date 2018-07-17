@@ -23,7 +23,7 @@ build build simple;
 target/simple/debug/simple;
 build clean release run;
 build clean;
-build TEST;
+#build TEST;
 
 popd > /dev/null;
 
@@ -39,7 +39,7 @@ LD_LIBRARY_PATH=target/test/debug:$LD_LIBRARY_PATH;
 target/test/debug/test;
 build clean common;
 build clean release run;
-build TEST;
+#build TEST;
 build clean;
 
 popd > /dev/null;
