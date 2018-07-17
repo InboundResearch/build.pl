@@ -212,8 +212,6 @@ target -+- (lib) -+- (config) -+- objects -+- *.o
 ```
 
 ## 3. TODO
-* copy resources
-* ensure runnable code when building with shared libraries in linux (this works in MacOS without any special handling), possibly need a "copy dependencies" component.
 * figure out how to build shared libraries on cygwin, maybe have to add a "platforms" object in the context, and set that appropriately based on a `uname -s` call? something informed by this:
 ```
 unameOut="$(uname -s)"
@@ -226,4 +224,6 @@ case "${unameOut}" in
 esac
 echo ${machine}
 ```
-
+* dependencies out to be traversed in the graph fashion when building the includes and libraries lists, rather than requiring individual projects to list all of their dependencies.
+* libraries ought to be copied only for dependencies that need them (like applications)
+* think some more about how the variable resolution process should work

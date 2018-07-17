@@ -34,12 +34,15 @@ Context::addTypeNamed("project", $ContextType{VALUES},
 if ($ARGV[0] eq "projects") {
     my $sourcePath = Context::confType ("project", $ContextType{VALUES}, "sourcePath");
     if (opendir(SOURCE_PATH, $sourcePath)) {
+        my $separator = "";
         while (my $target = readdir(SOURCE_PATH)) {
             # skip unless $target is a non-hidden directory, that is not also the build directory
             next unless (($target !~ /^\./) && (-d "$sourcePath/$target"));
             next if (abs_path("$sourcePath/$target") eq abs_path(Context::confType("project", $ContextType{VALUES}, "buildPath")));
-            print "$target\n";
+            print "$separator$target";
+            $separator = ",";
         }
+        print "\n";
         closedir(SOURCE_PATH);
     }
     else {

@@ -40,20 +40,23 @@
             "compilerOptions": "$compilerOptions -c $sourceFile $includes -o $objectFile",
             "dependerOptions": "$compilerOptions -MM $sourceFile $includes > $dependencyFile",
             "linkerOptions": "$linkerOptions -o $outputFile $objectsFullPath/*$objectExtension $libraries",
-            "outputFile": "$outputPath/$target"
+            "outputFile": "$outputPath/$target",
+            "copyDependencies": 1
         },
         "sharedLibrary": {
             "compilerOptions": "$compilerOptions -fPIC -c $sourceFile $includes -o $objectFile",
             "dependerOptions": "$compilerOptions -MM $sourceFile $includes > $dependencyFile",
             "linkerOptions": "$linkerOptions -shared -o $outputFile $objectsFullPath/*$objectExtension",
-            "outputFile": "$outputPath/lib$target.so"
+            "outputFile": "$outputPath/lib$target.so",
+            "copyDependencies": 0
         },
         "staticLibrary": {
             "compilerOptions": "$compilerOptions -c $sourceFile $includes -o $objectFile",
             "dependerOptions": "$compilerOptions -MM $sourceFile $includes > $dependencyFile",
             "linker": "$(find /usr/local/bin /usr/bin | grep -P \"\\/ar$\" | head -n 1)",
             "linkerOptions": "$linkerOptions rcs $outputFile $objectsFullPath/*$objectExtension",
-            "outputFile": "$outputPath/lib$target.a"
+            "outputFile": "$outputPath/lib$target.a",
+            "copyDependencies": 0
         }
     }
 }

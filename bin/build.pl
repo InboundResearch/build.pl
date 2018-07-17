@@ -76,31 +76,30 @@ if (opendir(SOURCE_PATH, $sourcePath)) {
 #---------------------------------------------------------------------------------------------------
 # phase 3 - identify the targets to build, and the dependency order to do it
 #---------------------------------------------------------------------------------------------------
-my $targetsInDependencyOrder = [];
-
 # the dependency graph is implicit in the dependencies array for each target, so we traverse it in
 # depth first order, emitting build targets on return (marking them as visited).
 sub traverseTargetDependencies {
-    my ($target) = @_;
+    my ($targetDependencies, $target, $forTarget) = @_;
     if (exists ($targets->{$target})) {
         if (!exists($targets->{$target}->{touched})) {
             $targets->{$target}->{touched} = 1;
             my $dependencies = exists($targets->{$target}->{dependencies}) ? $targets->{$target}->{dependencies} : [];
             for my $dependency (sort (@$dependencies)) {
-                traverseTargetDependencies($dependency);
+                traverseTargetDependencies($targetDependencies, $dependency, $forTarget);
             }
-            push (@$targetsInDependencyOrder, $target);
+            push (@$targetDependencies, $target);
         }
     } else {
-        print STDERR "Unknown target: $target\n";
+        print STDERR "Dependency ($target) of ($forTarget) is not a known target.\n";
         exit (1);
     }
 }
 
 my $targetsToBuild = Context::confType ("project", $ContextType{VALUES}, "target");
 $targetsToBuild = (ref $targetsToBuild eq "ARRAY") ? $targetsToBuild : (($targetsToBuild ne "*") ? [split (/[, ]+/, $targetsToBuild)] : [sort keys (%$targets)]);
+my $targetsInDependencyOrder = [];
 for my $target (@$targetsToBuild) {
-    traverseTargetDependencies ($target);
+    traverseTargetDependencies ($targetsInDependencyOrder, $target, $target);
 }
 
 #---------------------------------------------------------------------------------------------------
@@ -134,6 +133,20 @@ sub checkObjectDependencies {
         # the object doesn't exist, it should be built
         return 1;
     }
+}
+
+#---------------------------------------------------------------------------------------------------
+sub getTargetDependencies {
+    my ($target)  = @_;
+
+    # set all the existing dependencies to untouched
+    for my $key (keys (%$targets)) {
+        delete $targets->{$key}->{touched};
+    }
+
+    my $targetDependencies = [];
+    traverseTargetDependencies ($targetDependencies, $target, $target);
+    return $targetDependencies;
 }
 
 #---------------------------------------------------------------------------------------------------
@@ -191,7 +204,7 @@ for my $target (@$targetsInDependencyOrder) {
             my $includes = "-I$sourcePath ";
             my $libraries = "";
             my $separator = "";
-            my $dependencies = exists($targetContext->{dependencies}) ? $targetContext->{dependencies} : [];
+            my $dependencies = getTargetDependencies ($target); #exists($targetContext->{dependencies}) ? $targetContext->{dependencies} : [];
             for my $dependency (@$dependencies) {
                 $includes .= $separator . $targets->{$dependency}->{toInclude};
                 $libraries .= $separator . $targets->{$dependency}->{linkTo};
@@ -213,6 +226,7 @@ for my $target (@$targetsInDependencyOrder) {
             my @threads;
 
             # loop over all the source files in the source path to compile them, if needed
+            # XXX TODO: should this load all the sources and process them in some order (alphabetical)?
             if (opendir(SOURCE_TARGET_DIR, $targetContext->{sourceFullPath})) {
                 while (my $sourceTargetFile = readdir(SOURCE_TARGET_DIR)) {
                     if ($sourceTargetFile =~ /(.*)$targetContext->{"sourceExtension"}$/) {
@@ -286,10 +300,12 @@ for my $target (@$targetsInDependencyOrder) {
             }
 
             # check to see if we need to copy dependencies
-            for my $dependency (@$dependencies) {
-                if ($targets->{$dependency}->{type} eq "sharedLibrary") {
-                    print STDERR "    DEPENDENCY: " . $targets->{$dependency}->{outputFile} . "\n";
-                    exit ($!) if (copy($targets->{$dependency}->{outputFile}, $targetContext->{outputPath}) == 0);
+            if ($targetContext->{copyDependencies} == 1) {
+                for my $dependency (@$dependencies) {
+                    if ($targets->{$dependency}->{type} eq "sharedLibrary") {
+                        print STDERR "    DEPENDENCY: " . $targets->{$dependency}->{outputFile} . "\n";
+                        exit($!) if (copy($targets->{$dependency}->{outputFile}, $targetContext->{outputPath}) == 0);
+                    }
                 }
             }
 
