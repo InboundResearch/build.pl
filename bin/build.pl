@@ -77,7 +77,8 @@ if (opendir(SOURCE_PATH, $sourcePath)) {
 # phase 3 - identify the targets to build, and the dependency order to do it
 #---------------------------------------------------------------------------------------------------
 # the dependency graph is implicit in the dependencies array for each target, so we traverse it in
-# depth first order, emitting build targets on return (marking them as visited).
+# depth first order, emitting build targets on return (and marking them as "touched" so we don't
+# emit them twice).
 sub traverseTargetDependencies {
     my ($targetDependencies, $target, $forTarget) = @_;
     if (exists ($targets->{$target})) {
@@ -95,6 +96,7 @@ sub traverseTargetDependencies {
     }
 }
 
+# traverse the dependencies for all the targets into one list
 my $targetsToBuild = Context::confType ("project", $ContextType{VALUES}, "target");
 $targetsToBuild = (ref $targetsToBuild eq "ARRAY") ? $targetsToBuild : (($targetsToBuild ne "*") ? [split (/[, ]+/, $targetsToBuild)] : [sort keys (%$targets)]);
 my $targetsInDependencyOrder = [];
@@ -144,6 +146,7 @@ sub getTargetDependencies {
         delete $targets->{$key}->{touched};
     }
 
+    # traverse the dependency graph for this target
     my $targetDependencies = [];
     traverseTargetDependencies ($targetDependencies, $target, $target);
     return $targetDependencies;
