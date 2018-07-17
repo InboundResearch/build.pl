@@ -1,6 +1,6 @@
-#include    "PtrTo.h"
-
 #pragma once
+
+#include    "PtrTo.h"
 
 // RawText is generally presumed to be a buffer containing a valid UTF-8 encoding of text. As such,
 // no wide-char support is provided, nor is there a direct indexing capability. the user must read
@@ -85,12 +85,6 @@ MAKE_PTR_TO(RawText) {
             return false;
         }
 
-        /*
-        bool set (const char* source) {
-            return set (source, strlen (source));
-        }
-        */
-
         char* get () {
             return bytes;
         }
@@ -111,17 +105,11 @@ MAKE_PTR_TO(RawText) {
             uint minLength = min (length, sourceLength);
             int comparison = memcmp (bytes, source, minLength);
             if ((comparison != 0) or (length == sourceLength)) {
-                return comparison;
+                return sgn (comparison);
             } else {
-                return length - sourceLength;
+                return sgn ((int) length - (int) sourceLength);
             }
         }
-
-        /*
-        int compare (const RawText* rawText) {
-            return compare (rawText->bytes, rawText->length);
-        }
-        */
 
         bool append (const char* source, uint sourceLength) {
             if ((length + sourceLength) <= capacity) {
@@ -132,18 +120,6 @@ MAKE_PTR_TO(RawText) {
             }
             return false;
         }
-
-        /*
-        bool append (const RawText* rawText) {
-            return append (rawText->bytes, rawText->length);
-        }
-        */
-
-        /*
-        bool append (const char* source) {
-            return append (source, strlen (source));
-        }
-        */
 
         static PtrToRawText getEmpty () {
             if (! empty) {

@@ -16,8 +16,8 @@ TEST_CASE(TestText1) {
     TEST_XYOP(worldText, world, ==);
     TEST_XY(worldText.length(), 5);
 
-    TEST_XY(helloText.compare(worldText), 'H' - 'W');
-    TEST_XY(worldText.compare(helloText), 'W' - 'H');
+    TEST_XY(helloText.compare(worldText), sgn ('H' - 'W'));
+    TEST_XY(worldText.compare(helloText), sgn ('W' - 'H'));
     TEST_XY(helloText < worldText, true);
     TEST_XY(helloText <= worldText, true);
     TEST_XY(worldText > helloText, true);
