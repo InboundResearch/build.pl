@@ -159,7 +159,7 @@ for my $target (@$targetsInDependencyOrder) {
                 "project-" . $ContextType{VALUES},
                 "$targetPrefix$target-" . $ContextType{VALUES}
             );
-            $targetContext = Context::reduce(Context::concatenate(
+            $targetContext = Context::concatenate(
                 $targetContext,
                 { target => "$target", configuration => "$configuration" },
                 Context::concatenate(
@@ -172,7 +172,13 @@ for my $target (@$targetsInDependencyOrder) {
                     Context::getTypeNamed("project", $ContextType{TYPES})->{$targetContext->{type}},
                     Context::getTypeNamed("$targetPrefix$target", $ContextType{TYPES})->{$targetContext->{type}}
                 )
-            ));
+            );
+
+            # a couple of passes at reduction
+            # XXX TODO: this needs a bit more thought about how reduction works
+            for (my $i = 0; $i < 3; $i++) {
+                $targetContext = Context::reduce($targetContext);
+            }
 
             # ensure the target directory is present
             make_path($targetContext->{objectsFullPath});
