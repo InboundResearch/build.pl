@@ -224,6 +224,4 @@ case "${unameOut}" in
 esac
 echo ${machine}
 ```
-* dependencies out to be traversed in the graph fashion when building the includes and libraries lists, rather than requiring individual projects to list all of their dependencies.
-* libraries ought to be copied only for dependencies that need them (like applications)
 * think some more about how the variable resolution process should work
