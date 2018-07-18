@@ -225,4 +225,5 @@ esac
 echo ${machine}
 ```
 * think some more about how the variable resolution process should work
-* look to see if we are inside a project dir
+* precompiled header support
+

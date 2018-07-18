@@ -31,8 +31,8 @@ Context::addTypeNamed("project", $ContextType{VALUES},
     )
 );
 
-if ($ARGV[0] eq "projects") {
-    my $sourcePath = Context::confType ("project", $ContextType{VALUES}, "sourcePath");
+if ($ARGV[0] eq "targets") {
+    my $sourcePath = Context::confType("project", $ContextType{VALUES}, "sourcePath");
     if (opendir(SOURCE_PATH, $sourcePath)) {
         my $separator = "";
         while (my $target = readdir(SOURCE_PATH)) {
@@ -48,6 +48,17 @@ if ($ARGV[0] eq "projects") {
     else {
         print STDERR "Can't open source directory ($sourcePath), $!\n";
     }
+} elsif ($ARGV[0] eq "configurations") {
+    my $configurationsHash = Context::concatenate (
+        Context::getTypeNamed("root", $ContextType{CONFIGURATIONS}),
+        Context::getTypeNamed("project", $ContextType{CONFIGURATIONS})
+    );
+    my $separator = "";
+    for my $configuration (sort keys (%$configurationsHash)) {
+        print "$separator$configuration";
+        $separator = ",";
+    }
+    print "\n";
 } else {
     my $result = Context::confType ("project", $ContextType{VALUES}, $ARGV[0]);
     if (defined $result) {
