@@ -70,7 +70,7 @@ echo "4";
 build;
 
 echo "5";
-LD_LIBRARY_PATH=target/test/debug:$LD_LIBRARY_PATH;
+export LD_LIBRARY_PATH=target/test/debug:$LD_LIBRARY_PATH;
 target/test/debug/test;
 
 echo "6";
