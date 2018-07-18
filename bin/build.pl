@@ -315,7 +315,7 @@ for my $target (@$targetsInDependencyOrder) {
 
             # check to see if we need to copy resources
             if (-d "$targetContext->{resourcesFullPath}") {
-                print STDERR "    COPY RESOURCES: $targetContext->{resourcesFullPath}\n";
+                print STDERR "    COPY: $targetContext->{resourcesFullPath}\n";
                 exit ($!) unless (system("rsync -qa $targetContext->{resourcesFullPath}/* $targetContext->{outputPath}") == 0);
             }
         } else {
