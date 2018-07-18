@@ -25,7 +25,7 @@ while [ "$(cd $searchDir; echo $PWD;)" != "$stopDir" ] && [ "$(cd $searchDir; ec
     searchDir="../$searchDir";
 done
 cd "$projectDir";
-echo "PROJECT $PWD";
+echo "PROJECT: $PWD";
 
 # all the values we will use to do the actual build, with default values pre-populated with
 # reasonable defaults.
@@ -69,7 +69,7 @@ if [ "$#" -gt 0 ]; then
                     # separator is set so that subsequent targets get added to the list as a comma
                     # separated list.
                     shouldBuild=1;
-                    echo "TARGET $target";
+                    echo "TARGET: $target";
                     shouldTarget="$shouldTarget$targetSeparator$target";
                     targetSeparator=",";
                 else
@@ -78,7 +78,7 @@ if [ "$#" -gt 0 ]; then
                     IFS="," read -r -a configurations <<< "$allConfigurations";
                     for configuration in "${configurations[@]}"; do
                         if [ "$target" == "$configuration" ]; then
-                            echo "CONFIGURATION $configuration";
+                            echo "CONFIGURATION: $configuration";
                             shouldConfiguration=$target;
                             matchedConfiguration=1;
                         fi

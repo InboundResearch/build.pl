@@ -206,8 +206,8 @@ for my $target (@$targetsInDependencyOrder) {
             # XXX TODO: is that true - link dependencies only exist for apps, so it is - but one library
             # XXX TODO: could include headers from another (one presumes), and I can even see circular
             # XXX TODO: dependencies arising out of that...
-            my $includes = "-I$sourcePath ";
-            my $libraries = "-L" . $targetContext->{outputPath} . " ";
+            my $includes = "";
+            my $libraries = "";
             my $separator = "";
             my $dependencies = getTargetDependencies ($target, exists($targetContext->{dependencies}) ? $targetContext->{dependencies} : []);
             for my $dependency (@$dependencies) {

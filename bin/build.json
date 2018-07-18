@@ -19,8 +19,6 @@
         "sourceFile": "$sourceFullPath/$sourceBase$sourceExtension",
         "dependencyFile": "$objectsFullPath/$sourceBase$dependencyExtension",
         "objectFile": "$objectsFullPath/$sourceBase$objectExtension",
-        "linkTo": "-l$target",
-        "toInclude": "-I$sourceFullPath",
         "compiler": "$(find /usr/local/bin /usr/bin | grep -P \"\\/g\\+\\+\" | head -n 1)",
         "depender": "$compiler",
         "linker": "$compiler"
@@ -37,24 +35,28 @@
     },
     "types": {
         "application": {
-            "compilerOptions": "$compilerOptions -c $sourceFile $includes -o $objectFile",
+            "compilerOptions": "$compilerOptions -c $sourceFile -I$sourcePath $includes -o $objectFile",
             "dependerOptions": "$compilerOptions -MM $sourceFile $includes > $dependencyFile",
-            "linkerOptions": "$linkerOptions -o $outputFile $objectsFullPath/*$objectExtension $libraries",
+            "linkerOptions": "$linkerOptions -o $outputFile $objectsFullPath/*$objectExtension -L$outputPath $libraries",
             "outputFile": "$outputPath/$target",
             "copyDependencies": 1
         },
-        "sharedLibrary": {
-            "compilerOptions": "$compilerOptions -fPIC -c $sourceFile $includes -o $objectFile",
+            "sharedLibrary": {
+            "toInclude": "-I$sourceFullPath",
+            "compilerOptions": "$compilerOptions -fPIC -c $sourceFile -I$sourcePath $includes -o $objectFile",
             "dependerOptions": "$compilerOptions -MM $sourceFile $includes > $dependencyFile",
             "linkerOptions": "$linkerOptions -shared -o $outputFile $objectsFullPath/*$objectExtension",
+            "linkTo": "-l$target",
             "outputFile": "$outputPath/lib$target.so",
             "copyDependencies": 0
         },
-        "staticLibrary": {
-            "compilerOptions": "$compilerOptions -c $sourceFile $includes -o $objectFile",
+            "staticLibrary": {
+            "toInclude": "-I$sourceFullPath",
+            "compilerOptions": "$compilerOptions -c $sourceFile -I$sourcePath $includes -o $objectFile",
             "dependerOptions": "$compilerOptions -MM $sourceFile $includes > $dependencyFile",
             "linker": "$(find /usr/local/bin /usr/bin | grep -P \"\\/ar$\" | head -n 1)",
             "linkerOptions": "$linkerOptions rcs $outputFile $objectsFullPath/*$objectExtension",
+            "linkTo": "-L$outputPath -l$target",
             "outputFile": "$outputPath/lib$target.a",
             "copyDependencies": 0
         }
