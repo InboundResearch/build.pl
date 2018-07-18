@@ -100,17 +100,22 @@ if [ "$shouldTarget" != "" ]; then
     fi
 
     if [ "$shouldRun" -eq 1 ]; then
-        # linux needs to set the shared library path
-        export LD_LIBRARY_PATH=.:$LD_LIBRARY_PATH;
+        # linux and MacOS need to set the shared library path
+        oldLibPath=$LD_LIBRARY_PATH;
+        oldDyLibPath=$DYLD_LIBRARY_PATH;
         IFS="," read -r -a targets <<< "$shouldTarget";
         for target in "${targets[@]}"; do
             if [ -x "$targetDir/$target/$shouldConfiguration/$target" ]; then
                 pushd $targetDir/$target/$shouldConfiguration > /dev/null;
+                export LD_LIBRARY_PATH="$PWD:$oldLibPath";
+                export DYLD_LIBRARY_PATH="$PWD:$oldDyLibPath";
                 echo;
-                $target 2> >(tee $target.stderr) ;
+                ./$target 2> >(tee $target.stderr) ;
                 popd > /dev/null;
             fi
         done
+        export LD_LIBRARY_PATH=$oldLibPath;
+        export DYLD_LIBRARY_PATH=$oldDyLibPath;
     fi
 else
     echo "No target specified";

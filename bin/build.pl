@@ -207,7 +207,7 @@ for my $target (@$targetsInDependencyOrder) {
             # XXX TODO: could include headers from another (one presumes), and I can even see circular
             # XXX TODO: dependencies arising out of that...
             my $includes = "-I$sourcePath ";
-            my $libraries = "";
+            my $libraries = "-L" . $targetContext->{outputPath} . " ";
             my $separator = "";
             my $dependencies = getTargetDependencies ($target, exists($targetContext->{dependencies}) ? $targetContext->{dependencies} : []);
             for my $dependency (@$dependencies) {
@@ -287,10 +287,19 @@ for my $target (@$targetsInDependencyOrder) {
                 my $result = shift (@threads)->join ();
                 $compilationSuccessful = $compilationSuccessful & $result;
             }
-            $linkNeeded = $linkNeeded & $compilationSuccessful;
 
             # exit if compilations failed
             exit (1) if (!$compilationSuccessful);
+
+            # check to see if we need to copy dependencies
+            if ($targetContext->{copyDependencies} == 1) {
+                for my $dependency (@$dependencies) {
+                    if ($targets->{$dependency}->{type} eq "sharedLibrary") {
+                        print STDERR "    DEPENDENCY: " . $targets->{$dependency}->{outputFile} . "\n";
+                        exit($!) if (copy($targets->{$dependency}->{outputFile}, $targetContext->{outputPath}) == 0);
+                    }
+                }
+            }
 
             # check to see if we need to link...
             if ((!-e $targetContext->{outputFile}) || ($linkNeeded & $compilationSuccessful)) {
@@ -302,16 +311,6 @@ for my $target (@$targetsInDependencyOrder) {
 
                 # exit if link fails
                 exit ($!) unless (system($link) == 0);
-            }
-
-            # check to see if we need to copy dependencies
-            if ($targetContext->{copyDependencies} == 1) {
-                for my $dependency (@$dependencies) {
-                    if ($targets->{$dependency}->{type} eq "sharedLibrary") {
-                        print STDERR "    DEPENDENCY: " . $targets->{$dependency}->{outputFile} . "\n";
-                        exit($!) if (copy($targets->{$dependency}->{outputFile}, $targetContext->{outputPath}) == 0);
-                    }
-                }
             }
 
             # check to see if we need to copy resources

@@ -19,7 +19,7 @@
         "sourceFile": "$sourceFullPath/$sourceBase$sourceExtension",
         "dependencyFile": "$objectsFullPath/$sourceBase$dependencyExtension",
         "objectFile": "$objectsFullPath/$sourceBase$objectExtension",
-        "linkTo": "-L$outputPath -l$target",
+        "linkTo": "-l$target",
         "toInclude": "-I$sourceFullPath",
         "compiler": "$(find /usr/local/bin /usr/bin | grep -P \"\\/g\\+\\+\" | head -n 1)",
         "depender": "$compiler",
