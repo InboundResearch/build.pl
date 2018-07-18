@@ -139,7 +139,7 @@ sub checkObjectDependencies {
 
 #---------------------------------------------------------------------------------------------------
 sub getTargetDependencies {
-    my ($target)  = @_;
+    my ($target, $dependencies)  = @_;
 
     # set all the existing dependencies to untouched
     for my $key (keys (%$targets)) {
@@ -148,7 +148,9 @@ sub getTargetDependencies {
 
     # traverse the dependency graph for this target
     my $targetDependencies = [];
-    traverseTargetDependencies ($targetDependencies, $target, $target);
+    for my $dependency (@$dependencies) {
+        traverseTargetDependencies($targetDependencies, $dependency, $target);
+    }
     return $targetDependencies;
 }
 
@@ -207,7 +209,7 @@ for my $target (@$targetsInDependencyOrder) {
             my $includes = "-I$sourcePath ";
             my $libraries = "";
             my $separator = "";
-            my $dependencies = getTargetDependencies ($target); #exists($targetContext->{dependencies}) ? $targetContext->{dependencies} : [];
+            my $dependencies = getTargetDependencies ($target, exists($targetContext->{dependencies}) ? $targetContext->{dependencies} : []);
             for my $dependency (@$dependencies) {
                 $includes .= $separator . $targets->{$dependency}->{toInclude};
                 $libraries .= $separator . $targets->{$dependency}->{linkTo};

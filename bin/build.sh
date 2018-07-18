@@ -7,7 +7,6 @@
 # exit automatically if anything fails
 set -e
 
-UNKNOWN="UNKNOWN";
 shouldClean=0;
 shouldBuild=0;
 shouldRun=0;
@@ -101,13 +100,15 @@ if [ "$shouldTarget" != "" ]; then
     fi
 
     if [ "$shouldRun" -eq 1 ]; then
+        # linux needs to set the shared library path
+        export LD_LIBRARY_PATH=.:$LD_LIBRARY_PATH;
         IFS="," read -r -a targets <<< "$shouldTarget";
         for target in "${targets[@]}"; do
             if [ -x "$targetDir/$target/$shouldConfiguration/$target" ]; then
+                pushd $targetDir/$target/$shouldConfiguration > /dev/null;
                 echo;
-                # linux needs to set the shared library path
-                export LD_LIBRARY_PATH=$targetDir/$target/$shouldConfiguration:$LD_LIBRARY_PATH;
-                $targetDir/$target/$shouldConfiguration/$target 2> >(tee $targetDir/$target/$shouldConfiguration/$target.stderr) ;
+                $target 2> >(tee $target.stderr) ;
+                popd > /dev/null;
             fi
         done
     fi
