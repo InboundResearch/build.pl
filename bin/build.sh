@@ -157,6 +157,7 @@ if [ "$shouldTarget" != "" ]; then
             # build a target path, then check to see if there is an executable
             targetPath="$targetDir/$target/$shouldConfiguration";
             if [ -x "$targetPath/$target" ]; then
+                echo "RUN: $targetPath/$target";
                 # go into the target directory - this makes the working directory the same as the
                 # executable directory, which simplifies some testing
                 pushd "$targetPath" > /dev/null;
@@ -168,7 +169,8 @@ if [ "$shouldTarget" != "" ]; then
                 # we run the target, but we have to give it a path, because some built executables
                 # might look like system or shell commands without it (i.e. test)
                 echo;
-                ./$target 2> >(tee $target.stderr) ;
+                ./$target 2> >(tee $target.stderr);
+                echo;
 
                 # and go back to where we were...
                 popd > /dev/null;
@@ -179,5 +181,7 @@ else
     echo "No target specified";
     exit 1;
 fi
+
+echo "FINISHED.";
 
 exit 0;
