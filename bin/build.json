@@ -19,7 +19,7 @@
         "sourceFile": "$sourceFullPath/$sourceBase$sourceExtension",
         "dependencyFile": "$objectsFullPath/$sourceBase$dependencyExtension",
         "objectFile": "$objectsFullPath/$sourceBase$objectExtension",
-        "compiler": "$(find /usr/local/bin /usr/bin | grep -P \"\\/g\\+\\+\" | head -n 1)",
+        "compiler": "$(find /usr/local/bin /usr/bin | grep -P \"bin\\/g\\+\\+[^\\/]*\" | head -n 1)",
         "depender": "$compiler",
         "linker": "$compiler"
     },
