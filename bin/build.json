@@ -41,7 +41,7 @@
             "outputFile": "$outputPath/$target",
             "copyDependencies": 1
         },
-            "sharedLibrary": {
+        "sharedLibrary": {
             "toInclude": "-I$sourceFullPath",
             "compilerOptions": "$compilerOptions -fPIC -c $sourceFile -I$sourcePath $includes -o $objectFile",
             "dependerOptions": "$compilerOptions -MM $sourceFile $includes > $dependencyFile",
@@ -50,7 +50,7 @@
             "outputFile": "$outputPath/lib$target.so",
             "copyDependencies": 0
         },
-            "staticLibrary": {
+        "staticLibrary": {
             "toInclude": "-I$sourceFullPath",
             "compilerOptions": "$compilerOptions -c $sourceFile -I$sourcePath $includes -o $objectFile",
             "dependerOptions": "$compilerOptions -MM $sourceFile $includes > $dependencyFile",
@@ -58,6 +58,16 @@
             "linkerOptions": "$linkerOptions rcs $outputFile $objectsFullPath/*$objectExtension",
             "linkTo": "-L$outputPath -l$target",
             "outputFile": "$outputPath/lib$target.a",
+            "copyDependencies": 0
+        },
+        "noLink": {
+            "toInclude": "-I$sourceFullPath",
+            "compilerOptions": "$compilerOptions -c $sourceFile -I$sourcePath $includes -o $objectFile",
+            "dependerOptions": "$compilerOptions -MM $sourceFile $includes > $dependencyFile",
+            "linker": "echo -e \"\\c\"",
+            "linkerOptions": "$outputFile",
+            "linkTo": "",
+            "outputFile": "$sourcePath/$target.cpp",
             "copyDependencies": 0
         }
     }

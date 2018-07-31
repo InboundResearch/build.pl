@@ -133,14 +133,15 @@ if [ "$shouldTarget" != "" ]; then
         sourceExtension=$(getcontextvars.pl sourceExtension);
         for target in "${targets[@]}"; do
             sourceCount=$(ls -1 "$sourceDir/$target" 2> /dev/null | grep "$sourceExtension" | wc -l);
-            if [ "$sourceCount" -gt 0 ]; then
-                # the project has source files... let's build it using build.pl
-                build.pl target="$shouldTarget" configuration="$shouldConfiguration";
-            else
+            if [ "$sourceCount" -eq 0 ]; then
                 echo "No sources in $target, is this a project?";
                 exit 1;
             fi
         done
+
+        # all the targets have source files... let's build using build.pl
+        #echo "BUILD.PL IS BEING RUN ON: $shouldTarget";
+        build.pl target="$shouldTarget" configuration="$shouldConfiguration";
     fi
 
     # if run was requested, do that now...
