@@ -155,7 +155,7 @@ if [ "$shouldTarget" != "" ]; then
         # one by one
         IFS="," read -r -a targets <<< "$shouldTarget";
         for target in "${targets[@]}"; do
-            # build a target path, then check to see if there is an executable
+            # then check to see if there is an executable in the target path
             targetPath="$targetDir/$target/$shouldConfiguration";
             if [ -x "$targetPath/$target" ]; then
                 echo "RUN: $targetPath/$target";
