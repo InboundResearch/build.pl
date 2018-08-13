@@ -32,6 +32,7 @@ echo "PROJECT: $PWD";
 shouldClean=0;
 shouldBuild=0;
 shouldRun=0;
+shouldPush=0;
 shouldConfiguration=$(getcontextvars.pl configuration);
 sourceDir=$(getcontextvars.pl sourcePath);
 targetDir=$(getcontextvars.pl buildPath);
@@ -57,6 +58,9 @@ if [ "$#" -gt 0 ]; then
                 ;;
             run)
                 shouldRun=1;
+                ;;
+            push)
+                shouldPush=1;
                 ;;
             all)
                 shouldBuild=1;
@@ -181,6 +185,12 @@ if [ "$shouldTarget" != "" ]; then
 else
     echo "No target specified";
     exit 1;
+fi
+
+# if push was requested, do that now...
+if [ "$shouldPush" -eq 1 ]; then
+    echo "push";
+    git add --all . && git commit && git push;
 fi
 
 echo "FINISHED.";
