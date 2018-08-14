@@ -33,6 +33,7 @@ shouldClean=0;
 shouldBuild=0;
 shouldRun=0;
 shouldPush=0;
+shouldInstall=0;
 shouldConfiguration=$(getcontextvars.pl configuration);
 sourceDir=$(getcontextvars.pl sourcePath);
 targetDir=$(getcontextvars.pl buildPath);
@@ -61,6 +62,9 @@ if [ "$#" -gt 0 ]; then
                 ;;
             push)
                 shouldPush=1;
+                ;;
+            install)
+                shouldInstall=1;
                 ;;
             all)
                 shouldBuild=1;
@@ -124,7 +128,7 @@ fi
 
 # if clean was requested, do that now...
 if [ "$shouldClean" -eq 1 ]; then
-    echo "clean";
+    echo "CLEAN";
     rm -rf $targetDir;
 fi
 
@@ -183,14 +187,32 @@ if [ "$shouldTarget" != "" ]; then
         done
     fi
 else
+    # this shouldn't happen unless the user has deliberately configured an empty project
     echo "No target specified";
     exit 1;
 fi
 
 # if push was requested, do that now...
 if [ "$shouldPush" -eq 1 ]; then
-    echo "push";
-    git add --all . && git commit && git push;
+    echo "PUSH";
+    if [ -e "push" ]; then
+        ./push;
+        echo;
+    else
+        git add --all . && git commit && git push;
+    fi
+fi
+
+# if install was requested, do that now...
+if [ "$shouldInstall" -eq 1 ]; then
+    echo "INSTALL";
+    if [ -e "install" ]; then
+        ./install;
+        echo;
+    else
+        # should do a default install into ~/bin?
+        echo "no install provided";
+    fi
 fi
 
 echo "FINISHED.";
