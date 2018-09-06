@@ -136,16 +136,21 @@ fi
 if [ "$shouldTarget" != "" ]; then
     # if build or run was requested, do that now...
     if [ "$shouldBuild" -eq 1 ] || [ "$shouldRun" -eq 1 ]; then
-        # a little sanity check - check that all the targets have source files
+        # a little sanity check - check that one of the targets has source files
         IFS="," read -r -a targets <<< "$shouldTarget";
         sourceExtension=$(getcontextvars.pl sourceExtension);
+        totalSourceCount=0;
         for target in "${targets[@]}"; do
             sourceCount=$(ls -1 "$sourceDir/$target" 2> /dev/null | grep "$sourceExtension" | wc -l);
-            if [ "$sourceCount" -eq 0 ]; then
-                echo "No sources in $target, is this a project?";
-                exit 1;
-            fi
+            totalSourceCount=$(($totalSourceCount + $sourceCount))
+            #if [ "$sourceCount" -eq 0 ]; then
+            #    echo "No sources in $target...";
+            #fi
         done
+        if [ "$totalSourceCount" -eq 0 ]; then
+            echo "No sources found, is this a project?";
+            exit 1;
+        fi
 
         # all the targets have source files... let's build using build.pl
         #echo "BUILD.PL IS BEING RUN ON: $shouldTarget";
