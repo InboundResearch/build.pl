@@ -163,7 +163,7 @@ Command line options can be used to override build configuration settings. In pr
 
 NOTE - other build configuration variable values are too complicated to support from the command line. They may be specified, but the result is undefined and unsupported, and might be subject to later revision.
 
-### 2.10. tree structure -
+### 2.10. tree structure:
 i was originally going to try to mimic a maven project and allow other languages to be 
 present (java, etc.), but decided that a separate directory is ultimately cleaner. NOTE: 
 *ALL* built files are deposited in "target", so clean builds are made by removing "target".

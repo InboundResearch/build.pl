@@ -64,10 +64,10 @@
             "toInclude": "-I$sourceFullPath",
             "compilerOptions": "$compilerOptions -c $sourceFile -I$sourcePath $includes -o $objectFile",
             "dependerOptions": "$compilerOptions -MM $sourceFile $includes > $dependencyFile",
-            "linker": "echo -e \"\\c\"",
+            "linker": "noop",
             "linkerOptions": "$outputFile",
             "linkTo": "",
-            "outputFile": "$sourcePath/$target.cpp",
+            "outputFile": "$target",
             "copyDependencies": 0
         }
     }

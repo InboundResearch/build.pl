@@ -183,7 +183,7 @@ if [ "$shouldTarget" != "" ]; then
                 # we run the target, but we have to give it a path, because some built executables
                 # might look like system or shell commands without it (i.e. test)
                 echo;
-                ./$target 2> >(tee $target.stderr);
+                ./$target 2> >(tee "$target.stderr");
                 echo;
 
                 # and go back to where we were...
