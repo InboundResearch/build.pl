@@ -64,7 +64,7 @@
             "toInclude": "-I$sourceFullPath",
             "compilerOptions": "$compilerOptions -c $sourceFile -I$sourcePath $includes -o $objectFile",
             "dependerOptions": "$compilerOptions -MM $sourceFile $includes > $dependencyFile",
-            "linker": "noop",
+            "linker": "no-op",
             "linkerOptions": "$outputFile",
             "linkTo": "",
             "outputFile": "$target",

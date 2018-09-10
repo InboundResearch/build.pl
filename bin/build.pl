@@ -17,10 +17,16 @@ use File::Path qw(make_path);
 use File::Basename;
 use Cwd qw(abs_path);
 
-# search under the script directory location for the "my" libs
+# search under the script directory location for the "my" libs - this statement is evaluated by perl
+# in an initial scan of the file, so no variables have been set yet
 use lib dirname (abs_path(__FILE__)) . "/my";
 use Context qw(%ContextType);
 use Slurp qw(slurp);
+
+# add the script dir to the path (to find no-op)
+my $scriptDir = dirname (abs_path(__FILE__));
+#print STDERR "scriptDir=$scriptDir\n";
+$ENV{PATH} = "$scriptDir:$ENV{PATH}";
 
 #---------------------------------------------------------------------------------------------------
 # phase 1 - get the contexts
