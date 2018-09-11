@@ -66,6 +66,9 @@ if [ "$#" -gt 0 ]; then
             clean)
                 shouldClean=1;
                 ;;
+            cloc)
+                tool cloc;
+                ;;
             build)
                 shouldBuild=1;
                 ;;
