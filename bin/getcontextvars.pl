@@ -105,12 +105,34 @@ if ($ARGV[0] eq "targets") {
         $separator = ",";
     }
     print "\n";
+} elsif ($ARGV[0] eq "tools") {
+    my $toolsContext = Context::concatenate (
+        Context::getTypeNamed("root", $ContextType{TOOLS}),
+        Context::getTypeNamed("project", $ContextType{TOOLS})
+    );
+
+    # allow for variable substitution in the tools
+    my $projectContext = Context::getTypeNamed("project", $ContextType{VALUES});
+    $toolsContext = Context::apply($projectContext, $toolsContext);
+    if (exists $toolsContext->{$ARGV[1]}) {
+        print $toolsContext->{$ARGV[1]} . "\n";
+        exit (0);
+    }
+
+    print STDERR "UNDEFINED TOOL ($ARGV[1]), should be one of: ";
+    my $separator = "";
+    for my $tool (sort keys (%$toolsContext)) {
+        print STDERR "$separator$tool";
+        $separator = ", ";
+    }
+    print STDERR "\n";
+    exit (1);
 } else {
     my $result = Context::confType ("project", $ContextType{VALUES}, $ARGV[0]);
     if (defined $result) {
         print "$result\n";
         exit (0);
     }
-    print "UNDEFINED\n";
+    print STDERR "UNDEFINED VAR ($ARGV[0])\n";
     exit (1);
 }

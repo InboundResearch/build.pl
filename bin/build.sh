@@ -7,6 +7,17 @@
 # exit automatically if anything fails
 set -e
 
+# setup a tool caller
+function tool {
+    local toolCmd="$(getcontextvars.pl tools $1)";
+    if [ "$toolCmd" != "" ]; then
+        echo "${1^^}: $toolCmd";
+        eval "$toolCmd";
+    else
+        echo "${1^^}: (empty tool definition)";
+    fi
+}
+
 # the default build.pl configuration will look for targets in the current directory, or a build.json
 # file that specifies where the targets are. occasionally, users will "accidentally" run from within
 # the project, but it might look like it is the project level. we look up a little bit to see if we
@@ -132,19 +143,12 @@ fi
 
 # if pull was requested, do that now...
 if [ "$shouldPull" -eq 1 ]; then
-    echo "PULL";
-    if [ -e "pull" ]; then
-        ./pull;
-        echo;
-    else
-        git pull;
-    fi
+    tool pull;
 fi
 
 # if clean was requested, do that now...
 if [ "$shouldClean" -eq 1 ]; then
-    echo "CLEAN";
-    rm -rf $targetDir;
+    tool clean;
 fi
 
 # after everything, if there is a build/run target...
@@ -214,25 +218,12 @@ fi
 
 # if push was requested, do that now...
 if [ "$shouldPush" -eq 1 ]; then
-    echo "PUSH";
-    if [ -e "push" ]; then
-        ./push;
-        echo;
-    else
-        git add --all . && git commit && git push;
-    fi
+    tool push;
 fi
 
 # if install was requested, do that now...
 if [ "$shouldInstall" -eq 1 ]; then
-    echo "INSTALL";
-    if [ -e "install" ]; then
-        ./install;
-        echo;
-    else
-        # should do a default install into ~/bin?
-        echo "no install provided";
-    fi
+    tool install;
 fi
 
 echo "FINISHED.";

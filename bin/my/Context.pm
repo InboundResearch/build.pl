@@ -103,7 +103,8 @@ our %ContextType = (
     BUILD          => "build",
     VALUES         => "values",
     CONFIGURATIONS => "configurations",
-    TYPES          => "types"
+    TYPES          => "types",
+    TOOLS          => "tools"
 );
 
 my %contexts;
@@ -165,6 +166,7 @@ sub load {
     addTypeNamed($baseName, $ContextType{VALUES}, $context->{$ContextType{VALUES}});
     addTypeNamed($baseName, $ContextType{CONFIGURATIONS}, $context->{$ContextType{CONFIGURATIONS}});
     addTypeNamed($baseName, $ContextType{TYPES}, $context->{$ContextType{TYPES}});
+    addTypeNamed($baseName, $ContextType{TOOLS}, $context->{$ContextType{TOOLS}});
     return $context;
 }
 
