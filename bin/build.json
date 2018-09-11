@@ -76,6 +76,6 @@
         "push": "git add --all . && git commit && git push",
         "install": "",
         "clean": "rm -rf $buildPath",
-        "cloc": "wc `find $sourcePath -name '*.[hc]*'` -l"
+        "cloc": "wc -l `find $sourcePath -name '*.[hc]*'`"
     }
 }
