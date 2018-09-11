@@ -32,6 +32,7 @@ echo "PROJECT: $PWD";
 shouldClean=0;
 shouldBuild=0;
 shouldRun=0;
+shouldPull=0;
 shouldPush=0;
 shouldInstall=0;
 shouldConfiguration=$(getcontextvars.pl configuration);
@@ -59,6 +60,9 @@ if [ "$#" -gt 0 ]; then
                 ;;
             run)
                 shouldRun=1;
+                ;;
+            pull)
+                shouldPull=1;
                 ;;
             push)
                 shouldPush=1;
@@ -125,6 +129,17 @@ fi
 #echo "sourceDir=$sourceDir";
 #echo "targetDir=$targetDir";
 #echo "shouldTarget=$shouldTarget";
+
+# if pull was requested, do that now...
+if [ "$shouldPull" -eq 1 ]; then
+    echo "PULL";
+    if [ -e "pull" ]; then
+        ./pull;
+        echo;
+    else
+        git pull;
+    fi
+fi
 
 # if clean was requested, do that now...
 if [ "$shouldClean" -eq 1 ]; then
