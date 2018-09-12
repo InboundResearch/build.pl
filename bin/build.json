@@ -74,7 +74,7 @@
     "tools": {
         "pull": "git pull",
         "push": "git add --all . && git commit && git push",
-        "install": "",
+        "deploy": "",
         "clean": "rm -rf $buildPath",
         "cloc": "wc -l `find $sourcePath -name '*.[hc]*'`"
     }

@@ -45,13 +45,13 @@ shouldBuild=0;
 shouldRun=0;
 shouldPull=0;
 shouldPush=0;
-shouldInstall=0;
+shouldDeploy=0;
 shouldConfiguration=$(getcontextvars.pl configuration);
 sourceDir=$(getcontextvars.pl sourcePath);
 targetDir=$(getcontextvars.pl buildPath);
 defaultTarget=$(getcontextvars.pl target);
-shouldTarget="";
 allTargets=($(getcontextvars.pl targets));
+shouldTarget="";
 allConfigurations=($(getcontextvars.pl configurations));
 targetSeparator="";
 
@@ -63,28 +63,28 @@ if [ "$#" -gt 0 ]; then
     for target in "$@"; do
         #echo $COMMAND;
         case "${target}" in
-            clean)
+            -clean)
                 shouldClean=1;
                 ;;
-            cloc)
+            -cloc)
                 tool cloc;
                 ;;
-            build)
+            -build)
                 shouldBuild=1;
                 ;;
-            run)
+            -run)
                 shouldRun=1;
                 ;;
-            pull)
+            -pull)
                 shouldPull=1;
                 ;;
-            push)
+            -push)
                 shouldPush=1;
                 ;;
-            install)
-                shouldInstall=1;
+            -deploy)
+                shouldDeploy=1;
                 ;;
-            all)
+            -all)
                 shouldBuild=1;
                 shouldTarget=$allTargets;
                 ;;
@@ -134,15 +134,6 @@ fi
 if [ "$shouldTarget" == "*" ]; then
     shouldTarget=$allTargets;
 fi
-
-# debug points
-#echo "shouldClean=$shouldClean";
-#echo "shouldBuild=$shouldBuild";
-#echo "shouldRun=$shouldRun";
-#echo "shouldConfiguration=$shouldConfiguration";
-#echo "sourceDir=$sourceDir";
-#echo "targetDir=$targetDir";
-#echo "shouldTarget=$shouldTarget";
 
 # if pull was requested, do that now...
 if [ "$shouldPull" -eq 1 ]; then
@@ -225,8 +216,8 @@ if [ "$shouldPush" -eq 1 ]; then
 fi
 
 # if install was requested, do that now...
-if [ "$shouldInstall" -eq 1 ]; then
-    tool install;
+if [ "$shouldDeploy" -eq 1 ]; then
+    tool deploy;
 fi
 
 echo "FINISHED.";
