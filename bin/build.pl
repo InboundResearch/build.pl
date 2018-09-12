@@ -322,7 +322,7 @@ for my $target (@$targetsInDependencyOrder) {
             # check to see if we need to copy resources
             if (-d "$targetContext->{resourcesFullPath}") {
                 print STDERR "    COPY: $targetContext->{resourcesFullPath}\n";
-                exit ($!) unless (system("rsync -qa $targetContext->{resourcesFullPath}/* $targetContext->{outputPath}") == 0);
+                exit ($!) unless (system("rsync -qau $targetContext->{resourcesFullPath}/* $targetContext->{outputPath}") == 0);
             }
         } else {
             print STDERR "SKIP $target/$configuration (unknown configuration)\n";
