@@ -115,6 +115,8 @@ if [ "$#" -gt 0 ]; then
                     if [ "$matchedConfiguration" -eq 0 ]; then
                         # don't try to figure out what the user meant, just die...
                         echo "Unknown target ($target)";
+                        echo "Valid targets are: $allTargets";
+                        echo "Valid configurations are: $allConfigurations";
                         exit 1;
                     fi
                 fi
