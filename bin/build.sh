@@ -107,6 +107,7 @@ if [ "$#" -gt 0 ]; then
                             echo "CONFIGURATION: $configuration";
                             shouldConfiguration=$target;
                             matchedConfiguration=1;
+                            shouldBuild=1;
                         fi
                     done
 
