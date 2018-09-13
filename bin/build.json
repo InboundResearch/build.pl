@@ -45,10 +45,10 @@
             "toInclude": "-I$sourceFullPath",
             "compilerOptions": "$compilerOptions -fPIC -c $sourceFile -I$sourcePath $includes -o $objectFile",
             "dependerOptions": "$compilerOptions -MM $sourceFile $includes > $dependencyFile",
-            "linkerOptions": "$linkerOptions -shared -o $outputFile $objectsFullPath/*$objectExtension",
+            "linkerOptions": "$linkerOptions -shared -o $outputFile $objectsFullPath/*$objectExtension -L$outputPath $libraries",
             "linkTo": "-l$target",
             "outputFile": "$outputPath/lib$target.so",
-            "copyDependencies": 0
+            "copyDependencies": 1
         },
         "staticLibrary": {
             "toInclude": "-I$sourceFullPath",
