@@ -86,13 +86,29 @@ see the github repository at https://github.com/brettonw/build.pl for details.
 
 EXAMPLES:
     > build
-        this simple command will attempt to build the project default target.
+        this simple command will attempt to build and run the project default
+        target, whose default is "*" (or all targets), with the default
+        configuration (debug).
 
     > build -clean
-        this simple command will perform a clean step and exit
+        this  command will perform a clean step and exit.
+
+    > build -clean -run
+        this command will perform a clean step, build, and run the project
+        default target, with the default configuration (debug).
 
     > build -pull -clean -run -all
+        this command will perform a pull step, clean, build, and run all the
+        project targets, with the default configuration (debug).
 
     > build -clean -run -all release
+        this command will perform a clean step, build, and run all the project
+        targets, with the "release" configuration.
 
     > build -run myprogram
+        this command will build and run the target "myprogram" with the default
+        configuration (debug).
+
+    > build -run myprogram release
+        this command will build and run the target "myprogram" with the
+        "release" configuration.
