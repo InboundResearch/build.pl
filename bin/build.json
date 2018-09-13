@@ -77,6 +77,6 @@
         "deploy": "",
         "clean": "rm -rf $buildPath",
         "cloc": "wc -l `find $sourcePath -name '*.[hc]*'`",
-        "defines": "echo | g++ -dM -E -"
+        "defines": "echo | $compiler -dM -E -"
     }
 }
