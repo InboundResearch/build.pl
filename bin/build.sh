@@ -23,6 +23,7 @@ function tool {
 # the project, but it might look like it is the project level. we look up a little bit to see if we
 # find a build.json to prevent some of the problems that might cause - worst case - search up to the
 # user's home directory (~), or the root, but take the highest one we find...
+scriptDir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)";
 searchDir=".";
 projectDir=".";
 stopDir=$(cd ~; echo $PWD;);
@@ -63,20 +64,34 @@ if [ "$#" -gt 0 ]; then
     for target in "$@"; do
         #echo $COMMAND;
         case "${target}" in
+            -help)
+                less "$scriptDir/build-help.txt";
+                exit 0;
+                ;;
+            -all)
+                shouldBuild=1;
+                shouldTarget=$allTargets;
+                ;;
+            -build)
+                shouldBuild=1;
+                ;;
             -clean)
                 shouldClean=1;
                 ;;
             -cloc)
                 tool cloc;
+                exit 0;
+                ;;
+            -configurations)
+                echo "Valid configurations are: ${allConfigurations//,/, }";
+                exit 0;
                 ;;
             -defines)
                 tool defines;
+                exit 0;
                 ;;
-            -build)
-                shouldBuild=1;
-                ;;
-            -run)
-                shouldRun=1;
+            -deploy)
+                shouldDeploy=1;
                 ;;
             -pull)
                 shouldPull=1;
@@ -84,12 +99,12 @@ if [ "$#" -gt 0 ]; then
             -push)
                 shouldPush=1;
                 ;;
-            -deploy)
-                shouldDeploy=1;
+            -run)
+                shouldRun=1;
                 ;;
-            -all)
-                shouldBuild=1;
-                shouldTarget=$allTargets;
+            -targets)
+                echo "Valid targets are: ${allTargets//,/, }";
+                exit 0;
                 ;;
             *)
                 # non-hard-coded command-line options are checked to see if they are a valid target
@@ -118,8 +133,8 @@ if [ "$#" -gt 0 ]; then
                     if [ "$matchedConfiguration" -eq 0 ]; then
                         # don't try to figure out what the user meant, just die...
                         echo "Unknown target ($target)";
-                        echo "Valid targets are: $allTargets";
-                        echo "Valid configurations are: $allConfigurations";
+                        echo "Valid targets are: ${allTargets//,/, }";
+                        echo "Valid configurations are: ${allConfigurations//,/, }";
                         exit 1;
                     fi
                 fi

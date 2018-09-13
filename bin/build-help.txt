@@ -1,0 +1,98 @@
+
+HELP: build <target> <configuration> <command>
+
+build is a tool for building c/c++ code projects with minimal setup and
+configuration. it is a bash shell script that works in conjunction with the
+build.pl perl script, so it can be run in any command line environment that
+supports bash (4+) and a threaded version of perl (5+). build will exit if any
+error is encourntered while performing the requested operations.
+
+see the github repository at https://github.com/brettonw/build.pl for details.
+
+<target>
+    is one (or more) of the targets in the source directory. setting any target
+    sets the build flag. the default behavior is to get the default target from
+    the build.json file (and that default is "*", or all). there is a special
+    command line option to set the build target:
+
+    -all                build (or run) all targets in the source directory.
+
+<configuration>
+    is any one of the configurations defined for the project. only one value is
+    permitted, and the last one given will be used. build.pl defines a default
+    set of configurations to include "debug" and "release". setting a
+    configuration sets the build flag.
+
+<command>
+    there are two types of commands: immediate, and deferred. immediate commands
+    are executed when encountered in the command line, and the program exits.
+    deferred commands set a value, or a flag to perform requested operations
+    during the build step. deferred commands are not queued.
+
+    immediate commands are:
+    -----------------------
+
+    -help               print this message, and exit.
+
+    -cloc               run the project tool to count lines of code in the
+                        source directory, and exit.
+
+    -configurations     print a list of valid configurations for the project,
+                        and exit.
+
+    -defines            print a list of preprocessor defines that are available
+                        to all sources, and exit. this is useful when examining
+                        compiler characteristics, or when developing code to
+                        work across multiple platforms.
+
+    -targets            print a list of valid targets (in dependency order) for
+                        the project, and exit.
+
+    deferred commands are (in the order the operations are performed):
+    ----------------------
+
+    -pull               set a flag to run the project tool to pull, or synch,
+                        sources from the source code management (SCM) system.
+                        the default behavior is a simple git pull.
+
+    -clean              set a flag to run the project tool to remove build
+                        artifacts from the project tree. the default behavior
+                        removes the build directory.
+
+    -build              indicates the tool should run a build step on the
+                        specified targets. the default value if not specified is
+                        to build, but other commands set or clear this command.
+                        for example, -clean clears the build flag to enable a
+                        simple clean-only build operation. setting any target
+                        will automatically set the build flag. if any of the
+                        targets fail to build, the build tool will exit.
+
+    -run                set a flag to run the targets. this step is completed
+                        after all targets are successfully built. setting the
+                        run flag implies -build. if any of the targets fails to
+                        run, or returns EXIT_FAILURE, the build tool will exit.
+
+    -push               set a flag to run the project tool to push, or checkin,
+                        sources to the source code management (SCM) system. the
+                        push operation is performed after a successful build,
+                        and run (if requested), but before the deploy operation.
+                        the default is a simple git add-commit-push.
+
+    -deploy             set a flag to run the project tool to deploy the built
+                        project. the deploy operation is performed only after
+                        all other steps complete successfully. the default
+                        behavior is to do nothing, set this option in your
+                        build.json file for the project if you want to use it.
+
+EXAMPLES:
+    > build
+        this simple command will attempt to build the project default target.
+
+    > build -clean
+        this simple command will perform a clean step and exit
+
+    > build -pull -clean -run -all
+
+    > build -clean -run -all release
+
+    > build -run myprogram
