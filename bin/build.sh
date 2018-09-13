@@ -69,6 +69,9 @@ if [ "$#" -gt 0 ]; then
             -cloc)
                 tool cloc;
                 ;;
+            -defines)
+                tool defines;
+                ;;
             -build)
                 shouldBuild=1;
                 ;;
