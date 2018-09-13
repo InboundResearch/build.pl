@@ -112,3 +112,15 @@ EXAMPLES:
     > build -run myprogram release
         this command will build and run the target "myprogram" with the
         "release" configuration.
+
+    > build -pull
+        this command pulls changes fromt he SCM repository. it is equivalent to
+        a "git pull", or "svn update".
+
+    > build -push
+        this command pushes changes to the SCM repository. it is equivalent to a
+        " git add -a . && git commit && git push;" or a "svn ci".
+
+    armed with these details, a good practice on checkin might be:
+
+    > build -clean -run -all debug && build -run -all release -push -deploy

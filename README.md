@@ -223,8 +223,9 @@ case "${unameOut}" in
 esac
 echo ${machine}
 ```
-* think some more about how the variable resolution process should work
-* precompiled header support
-* code generation phase
-* platform configurations, maybe as a substitute for global configuration
+* think some more about how the variable resolution process should work.
+* precompiled header support.
+* code generation phase.
+* platform configurations, maybe as a substitute for global configuration.
+* integrate a git-flow type of routine.
 
