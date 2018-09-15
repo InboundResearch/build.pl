@@ -18,12 +18,16 @@ function tool {
     fi
 }
 
+# add the script dir to the path, as some tools, like eclipse, don't actually add the path when you
+# set a build tool.
+scriptDir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)";
+export PATH=$scriptDir:$PATH;
+
 # the default build.pl configuration will look for targets in the current directory, or a build.json
 # file that specifies where the targets are. occasionally, users will "accidentally" run from within
 # the project, but it might look like it is the project level. we look up a little bit to see if we
 # find a build.json to prevent some of the problems that might cause - worst case - search up to the
 # user's home directory (~), or the root, but take the highest one we find...
-scriptDir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)";
 searchDir=".";
 projectDir=".";
 stopDir=$(cd ~; echo $PWD;);
