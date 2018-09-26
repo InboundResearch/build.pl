@@ -5,7 +5,7 @@ build is a tool for building c/c++ code projects with minimal setup and
 configuration. it is a bash shell script that works in conjunction with the
 build.pl perl script, so it can be run in any command line environment that
 supports bash (4+) and a threaded version of perl (5+). build will exit if any
-error is encourntered while performing the requested operations.
+error is encountered while performing the requested operations.
 
 see the github repository at https://github.com/brettonw/build.pl for details.
 
@@ -16,6 +16,10 @@ see the github repository at https://github.com/brettonw/build.pl for details.
     command line option to set the build target:
 
     -all                build (or run) all targets in the source directory.
+
+    target directories may be named using any valid unix filename. however,
+    naming target directories with a preceding dash is not recommended, as some
+    programs interpret such names as parameters.
 
 <configuration>
     is any one of the configurations defined for the project. only one value is
@@ -28,6 +32,10 @@ see the github repository at https://github.com/brettonw/build.pl for details.
     are executed when encountered in the command line, and the program exits.
     deferred commands set a value, or a flag to perform requested operations
     during the build step. deferred commands are not queued.
+
+    commands can be issued with a preceding dash ("-"), or not. using the dash
+    allows "build" to differentiate between targets and commands, in the case
+    where you have targets whose name matches one of the commands.
 
     immediate commands are:
     -----------------------

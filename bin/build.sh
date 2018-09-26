@@ -8,12 +8,20 @@
 set -e
 
 # setup a tool caller
-function tool {
+function toolCall {
     local toolCmd="$(getcontextvars.pl tools $1)";
     if [ "$toolCmd" != "" ]; then
         echo "${1^^}: $toolCmd";
         eval "$toolCmd";
+        toolResult=1;
     else
+        toolResult=0;
+    fi
+}
+
+function tool {
+    toolCall $1;
+    if [ "$toolResult" -eq 0 ]; then
         echo "${1^^}: (empty tool definition)";
     fi
 }
@@ -64,86 +72,86 @@ targetSeparator="";
 # the ability to specify one or more values that match a target or configuration (which are not
 # known a-priori and so are not hard-coded into the options), and the special value (all), which
 # builds all the targets.
+
 if [ "$#" -gt 0 ]; then
     for target in "$@"; do
         #echo $COMMAND;
-        case "${target}" in
-            -help)
-                less "$scriptDir/build-help.txt";
-                exit 0;
-                ;;
-            -all)
-                shouldBuild=1;
-                shouldTarget=$allTargets;
-                ;;
-            -build)
-                shouldBuild=1;
-                ;;
-            -clean)
-                shouldClean=1;
-                ;;
-            -cloc)
-                tool cloc;
-                exit 0;
-                ;;
-            -configurations)
-                echo "Valid configurations are: ${allConfigurations//,/, }";
-                exit 0;
-                ;;
-            -defines)
-                tool defines;
-                exit 0;
-                ;;
-            -deploy)
-                shouldDeploy=1;
-                ;;
-            -pull)
-                shouldPull=1;
-                ;;
-            -push)
-                shouldPush=1;
-                ;;
-            -run)
-                shouldRun=1;
-                ;;
-            -targets)
-                echo "Valid targets are: ${allTargets//,/, }";
-                exit 0;
-                ;;
-            *)
-                # non-hard-coded command-line options are checked to see if they are a valid target
-                if [ -d "$sourceDir/$target" ]; then
-                    # ensure that we will build, then add the target to the shouldTarget list. the
-                    # separator is set so that subsequent targets get added to the list as a comma
-                    # separated list.
-                    shouldBuild=1;
-                    echo "TARGET: $target";
-                    shouldTarget="$shouldTarget$targetSeparator$target";
-                    targetSeparator=",";
-                else
-                    # check against available configurations?
-                    matchedConfiguration=0;
-                    IFS="," read -r -a configurations <<< "$allConfigurations";
-                    for configuration in "${configurations[@]}"; do
-                        if [ "$target" == "$configuration" ]; then
-                            echo "CONFIGURATION: $configuration";
-                            shouldConfiguration=$target;
-                            matchedConfiguration=1;
-                            shouldBuild=1;
-                        fi
-                    done
 
-                    # check if we matched a valid configuration
-                    if [ "$matchedConfiguration" -eq 0 ]; then
-                        # don't try to figure out what the user meant, just die...
-                        echo "Unknown target ($target)";
-                        echo "Valid targets are: ${allTargets//,/, }";
-                        echo "Valid configurations are: ${allConfigurations//,/, }";
-                        exit 1;
-                    fi
+        # command-line options are first checked to see if they are a valid target
+        if [ -d "$sourceDir/$target" ]; then
+            # ensure that we will build, then add the target to the shouldTarget list. the
+            # separator is set so that subsequent targets get added to the list as a comma
+            # separated list.
+            shouldBuild=1;
+            echo "TARGET: $target";
+            shouldTarget="$shouldTarget$targetSeparator$target";
+            targetSeparator=",";
+        else
+            # check against available configurations?
+            matchedConfiguration=0;
+            IFS="," read -r -a configurations <<< "$allConfigurations";
+            for configuration in "${configurations[@]}"; do
+                if [ "$target" == "$configuration" ]; then
+                    echo "CONFIGURATION: $configuration";
+                    shouldConfiguration=$target;
+                    matchedConfiguration=1;
+                    shouldBuild=1;
                 fi
-                ;;
-        esac
+            done
+
+            # if we didn't match a valid configuration, try to treat it as a command-line option
+            if [ "$matchedConfiguration" -eq 0 ]; then
+                cmdTarget="${target//-/}";
+                # echo "CMD_TARGET=$cmdTarget";
+                case "-$cmdTarget" in
+                    -help)
+                        less "$scriptDir/build-help.txt";
+                        exit 0;
+                        ;;
+                    -all)
+                        shouldBuild=1;
+                        shouldTarget=$allTargets;
+                        ;;
+                    -build)
+                        shouldBuild=1;
+                        ;;
+                    -clean)
+                        shouldClean=1;
+                        ;;
+                    -configurations)
+                        echo "Valid configurations are: ${allConfigurations//,/, }";
+                        exit 0;
+                        ;;
+                    -deploy)
+                        shouldDeploy=1;
+                        ;;
+                    -pull)
+                        shouldPull=1;
+                        ;;
+                    -push)
+                        shouldPush=1;
+                        ;;
+                    -run)
+                        shouldRun=1;
+                        ;;
+                    -targets)
+                        echo "Valid targets are: ${allTargets//,/, }";
+                        exit 0;
+                        ;;
+                    *)
+                        # try to execute the target as a tool, and see if that succeeded
+                        toolCall $cmdTarget;
+                        if [ "$toolResult" -eq 0 ]; then
+                            # don't try to figure out what the user meant, just die...
+                            echo "UNKNOWN TARGET ($target)";
+                            echo "Valid targets are: ${allTargets//,/, }";
+                            echo "Valid configurations are: ${allConfigurations//,/, }";
+                            exit 1;
+                        fi
+                        ;;
+                esac
+            fi
+        fi
     done
 else
     # default to build and run in the default configuration (no clean)
@@ -186,7 +194,7 @@ if [ "$shouldTarget" != "" ]; then
             #fi
         done
         if [ "$totalSourceCount" -eq 0 ]; then
-            echo "No sources found, is this a project?";
+            echo "No source files found, is this a project?";
             exit 1;
         fi
 

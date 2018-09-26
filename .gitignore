@@ -38,3 +38,5 @@
 target
 .idea
 
+# something from idea perl?
+_Deparsed_XSubs.pm

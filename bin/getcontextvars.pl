@@ -119,7 +119,7 @@ if ($ARGV[0] eq "targets") {
         exit (0);
     }
 
-    print STDERR "UNDEFINED TOOL ($ARGV[1]), should be one of: ";
+    print STDERR "UNDEFINED TOOL ($ARGV[1])\nValid tools are: ";
     my $separator = "";
     for my $tool (sort keys (%$toolsContext)) {
         print STDERR "$separator$tool";
