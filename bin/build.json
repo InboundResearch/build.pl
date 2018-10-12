@@ -78,6 +78,6 @@
         "clean": "rm -rf $buildPath",
         "cloc": "wc -l `find $sourcePath -name '*.[hc]*'`",
         "defines": "echo | $compiler -dM -E -",
-        "refresh": "pushd $(dirname `which build`); git pull; popd"
+        "refresh-build": "pushd $(dirname `which build`); git pull; popd"
     }
 }

@@ -101,7 +101,7 @@ if [ "$#" -gt 0 ]; then
 
             # if we didn't match a valid configuration, try to treat it as a command-line option
             if [ "$matchedConfiguration" -eq 0 ]; then
-                cmdTarget="${target//-/}";
+                cmdTarget=$(echo "$target" | sed -e s/^-*//);
                 # echo "CMD_TARGET=$cmdTarget";
                 case "-$cmdTarget" in
                     -help)
