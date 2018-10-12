@@ -28,33 +28,41 @@ see the github repository at https://github.com/brettonw/build.pl for details.
     configuration sets the build flag.
 
 <command>
-    there are two types of commands: immediate, and deferred. immediate commands
-    are executed when encountered in the command line, and the program exits.
-    deferred commands set a value, or a flag to perform requested operations
-    during the build step. deferred commands are not queued.
+    there are three types of commands: immediate, tool, and deferred. immediate
+    commands are executed when encountered in the command line, and the program
+    may exit. tool commands run an operation defined in the "tools" section of
+    the project file, they are run immediately, but do not cause the program to
+    quit. deferred commands set a value, or a flag to perform requested
+    operations at the appropriate time during the build step. deferred commands
+    are NOT queued, so repeats have no affect.
 
-    commands can be issued with a preceding dash ("-"), or not. using the dash
-    allows "build" to differentiate between targets and commands, in the case
-    where you have targets whose name matches one of the commands.
+    commands can be issued with preceding dashes ("-", "--", etc.), or not.
+    using the dash allows "build" to differentiate between targets and commands,
+    in the case where you have targets whose name matches one of the commands.
 
     immediate commands are:
     -----------------------
 
-    -help               print this message, and exit.
-
-    -cloc               run the project tool to count lines of code in the
-                        source directory, and exit.
-
     -configurations     print a list of valid configurations for the project,
                         and exit.
+
+    -targets            print a list of valid targets (in dependency order) for
+                        the project, and exit.
+
+    the current tool commands are:
+    -----------------------
+    -help               print this message.
+
+    -cloc               run the project tool to count lines of code in the
+                        source directory.
 
     -defines            print a list of preprocessor defines that are available
                         to all sources, and exit. this is useful when examining
                         compiler characteristics, or when developing code to
                         work across multiple platforms.
 
-    -targets            print a list of valid targets (in dependency order) for
-                        the project, and exit.
+    -refresh-build      refresh the build tool itself. the tool is regularly
+                        updated, and this makes it easy to stay current.
 
     deferred commands are (in the order the operations are performed):
     ----------------------
@@ -132,3 +140,7 @@ EXAMPLES:
     armed with these details, a good practice on checkin might be:
 
     > build -clean -run -all debug && build -run -all release -push -deploy
+
+    and as discussed above, the dashes are optional, so we can also say:
+
+    build clean run all debug && build run all release push deploy

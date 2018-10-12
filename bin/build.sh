@@ -104,10 +104,6 @@ if [ "$#" -gt 0 ]; then
                 cmdTarget=$(echo "$target" | sed "s/^-*//");
                 # echo "CMD_TARGET=$cmdTarget";
                 case "-$cmdTarget" in
-                    -help)
-                        less "$scriptDir/build-help.txt";
-                        exit 0;
-                        ;;
                     -all)
                         shouldBuild=1;
                         shouldTarget=$allTargets;
