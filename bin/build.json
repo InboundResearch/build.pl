@@ -25,11 +25,11 @@
     },
     "configurations": {
         "debug": {
-            "compilerOptions": "-std=c++11 -Wall -g -D_DEBUG_",
+            "compilerOptions": "-std=c++11 -Wall -Wno-psabi -g -D_DEBUG_",
             "linkerOptions": ""
         },
         "release": {
-            "compilerOptions": "-std=c++11 -Wall -O3 -D_NDEBUG_",
+            "compilerOptions": "-std=c++11 -Wall -Wno-psabi -O3 -D_NDEBUG_",
             "linkerOptions": ""
         }
     },

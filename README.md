@@ -210,6 +210,17 @@ target -+- (lib) -+- (config) -+- objects -+- *.o
                                +- (copied resources)
 ```
 
+## 4. Git integration
+The build tool knows about git, but it's not particularly tightly integrated for something like a git-flow model. 
+
+One major problem is how to handle references to other repositories, to allow shared code libraries. Git has two ways to implement this, modules, and subtrees. Both are predicated on the notion that an external reference should be part of the repository, and so they both have some shortcomings if what you want is 100% transparent management of a git repository. 
+
+I have a slightly different view, where I think the reference should be part of the project. This enables me to consider configuring an external reference as a standalong git repository that is managed just like any other repository on your local client (push, pull, etc. without special keywords), by adding it to the .gitignore file for the project. 
+
+I still have some thinking to do, but this is the direction I'm headed...
+
+The primary downside to this is that the referenced project must be fully self-contained, and/or the reference build environment would have to refer to the top level build environment of the reference instead of the current build environment. the build tool is not smart enough to do things like remove duplicate flags in the relevant command lines, so some unintended consequences might arise if I take the view that the reference local project should just set flags that might already be set at the group level. 
+
 ## 3. TODO
 * figure out how to build shared libraries on cygwin, maybe have to add a "platforms" object in the context, and set that appropriately based on a `uname -s` call? something informed by this:
 ```

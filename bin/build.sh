@@ -4,7 +4,16 @@
 # to be a comprehensive make replacement, just a helper script to add a few other capabilities that
 # build.pl doesn't cover
 
-# exit automatically if anything fails
+# ensure perl, and perl json
+if ! perl -v > /dev/null 2>&1; then
+    echo "build requires a thread-enabled version of Perl."
+    exit 1;
+fi
+if ! perl -MJSON -e 1 > /dev/null 2>&1; then
+    cpan JSON;
+fi
+
+# exit automatically if anything fails from here on out
 set -e
 
 # setup a tool caller
