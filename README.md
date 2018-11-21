@@ -239,4 +239,6 @@ echo ${machine}
 * code generation phase.
 * platform configurations, maybe as a substitute for global configuration.
 * integrate a git-flow type of routine.
+* bash autocomplete
+
 
