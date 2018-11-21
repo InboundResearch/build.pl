@@ -215,7 +215,7 @@ The build tool knows about git, but it's not particularly tightly integrated for
 
 One major problem is how to handle references to other repositories, to allow shared code libraries. Git has two ways to implement this, modules, and subtrees. Both are predicated on the notion that an external reference should be part of the repository, and so they both have some shortcomings if what you want is 100% transparent management of a git repository. 
 
-I have a slightly different view, where I think the reference should be part of the project. This enables me to consider configuring an external reference as a standalong git repository that is managed just like any other repository on your local client (push, pull, etc. without special keywords), by adding it to the .gitignore file for the project. 
+I have a slightly different view, where I think the reference should be part of the project. This enables me to consider configuring an external reference as a standalone git repository that is managed just like any other repository on your local client (push, pull, etc. without special keywords), by adding it to the .gitignore file for the project. Of course, git doesn't actually support synching just one folder as if it were the repo (SVN does allow this quite easily), so the only way to actually make it work is to have a copy of the repository somewhere, and make a symbolic link to it. 
 
 I still have some thinking to do, but this is the direction I'm headed...
 
