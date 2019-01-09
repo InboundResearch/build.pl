@@ -39,10 +39,19 @@ my $targetPrefix = "#";
 my $sourcePath = Context::confType ("project", $ContextType{VALUES}, "sourcePath");
 
 if (opendir(SOURCE_PATH, $sourcePath)) {
-    while (my $target = readdir(SOURCE_PATH)) {
+	# cygwin abs_path fails if the file doesn't exist. we know the $target dir exists, but we're
+	# not sure about the context value for buildPath. We assemble the path manually and then 
+	# abs_path if it exists
+	my $buildPath = abs_path (".") . "/" . Context::confType ("project", $ContextType{VALUES}, "buildPath");
+	#print STDERR "PATHS to check ($buildPath)\n";
+	if (-e $buildPath) {
+		$buildPath = abs_path ($buildPath);
+	}
+
+	while (my $target = readdir(SOURCE_PATH)) {
         # skip unless $target is a non-hidden directory, that is not also the build directory
         next unless (($target !~ /^\./) && (-d "$sourcePath/$target"));
-        next if (abs_path("$sourcePath/$target") eq abs_path(Context::confType ("project", $ContextType{VALUES}, "buildPath")));
+        next if (abs_path("$sourcePath/$target") eq $buildPath);
 
         # load the target context to get the dependencies
         Context::load ("$targetPrefix$target", "$sourcePath/$target/");

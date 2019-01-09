@@ -3,6 +3,9 @@
 # exit automatically if anything fails
 set -e;
 
+# update the path to include the build toolset
+PATH="$PWD/../bin/:$PATH";
+
 echo "SIMPLE";
 pushd simple > /dev/null;
 
