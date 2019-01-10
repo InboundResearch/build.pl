@@ -64,13 +64,15 @@ my $sourcePath = Context::confType ("project", $ContextType{VALUES}, "sourcePath
 
 if (opendir(SOURCE_PATH, $sourcePath)) {
 	# cygwin abs_path fails if the file doesn't exist. we know the $target dir exists, but we're
-	# not sure about the context value for buildPath. We assemble the path manually and then 
-	# abs_path if it exists
+	# not sure about the context value for buildPath. We assemble the path manually and then call
+	# abs_path to normalize it if the path exists
 	my $buildPath = abs_path (".") . "/" . Context::confType ("project", $ContextType{VALUES}, "buildPath");
 	#print STDERR "PATHS to check ($buildPath)\n";
 	if (-e $buildPath) {
 		$buildPath = abs_path ($buildPath);
-	}
+	} else {
+        #print STDERR "WARNING, $buildPath does not exist.\n";
+    }
 
     while (my $target = readdir(SOURCE_PATH)) {
         # skip unless $target is a non-hidden directory, that is not also the build directory
