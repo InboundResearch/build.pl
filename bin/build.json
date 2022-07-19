@@ -37,7 +37,7 @@
         "application": {
             "compilerOptions": "$compilerOptions -c $sourceFile -I$sourcePath $includes -o $objectFile",
             "dependerOptions": "$compilerOptions -MM $sourceFile $includes > $dependencyFile",
-            "linkerOptions": "$linkerOptions -o $outputFile $objectsFullPath/*$objectExtension -L$outputPath $libraries",
+            "linkerOptions": "-o $outputFile $objectsFullPath/*$objectExtension -L$outputPath $libraries $linkerOptions",
             "outputFile": "$outputPath/$target",
             "copyDependencies": 1
         },
@@ -45,7 +45,7 @@
             "toInclude": "-I$sourceFullPath",
             "compilerOptions": "$compilerOptions -fPIC -c $sourceFile -I$sourcePath $includes -o $objectFile",
             "dependerOptions": "$compilerOptions -MM $sourceFile $includes > $dependencyFile",
-            "linkerOptions": "$linkerOptions -shared -o $outputFile $objectsFullPath/*$objectExtension -L$outputPath $libraries",
+            "linkerOptions": "-shared -o $outputFile $objectsFullPath/*$objectExtension -L$outputPath $libraries $linkerOptions",
             "linkTo": "-l$target",
             "outputFile": "$outputPath/lib$target.so",
             "copyDependencies": 1
@@ -55,7 +55,7 @@
             "compilerOptions": "$compilerOptions -c $sourceFile -I$sourcePath $includes -o $objectFile",
             "dependerOptions": "$compilerOptions -MM $sourceFile $includes > $dependencyFile",
             "linker": "$(find /usr/local/bin /usr/bin | grep -P \"\\/ar$\" | head -n 1)",
-            "linkerOptions": "$linkerOptions rcs $outputFile $objectsFullPath/*$objectExtension",
+            "linkerOptions": "rcs $outputFile $objectsFullPath/*$objectExtension $linkerOptions",
             "linkTo": "-L$outputPath -l$target",
             "outputFile": "$outputPath/lib$target.a",
             "copyDependencies": 0
