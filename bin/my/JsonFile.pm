@@ -4,9 +4,8 @@ use warnings FATAL => 'all';
 package JsonFile;
 
 # JSON handling
-use JSON; # imports encode_json, decode_json, to_json and from_json.
-my $json = JSON->new->allow_nonref;
-$json = $json->pretty(1);
+use JSON::PP;
+my $json = JSON::PP->new->pretty;
 
 # JSON FILE FUNCTIONS
 sub read {
