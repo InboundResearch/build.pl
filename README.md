@@ -5,19 +5,13 @@ build.pl is an easy to use perl script that does what "make" does for C++ projec
 ### 1.1. installation
 The specifics of where to install a script folder and how to add it to your path are left to the user, but you will need to add the ".../build.pl/bin" directory to your path.
 
-build uses Bash, and build.pl uses Perl, so you will need those installed. It's tested on Perl v.5.16 and up, but requires a version with threads support, and the JSON module needs to be installed. If it's missing, you can install it with:
-
-    > cpan JSON
+build uses Bash, and build.pl uses Perl, so you will need those installed. It's tested on Perl v.5.16 and up, but requires a version with threads support.
 
 #### 1.1.1. MacOS
-On MacOS, I use perlbrew, which installs an unthreaded version of perl by default. You will need to install a threaded version with a command line like:
+On MacOS, I use brew:
   
-    > perlbrew install --as perl-5.16.0t -Dusethreads perl-5.16.0
+    > brew install perl
 
-Once Perl is installed, you will need to use CPAN to install the JSON module:
-
-    > cpan JSON
-    
 I also use homebrew to install the gnu version of grep (which supports Perl-like regular expressions with the -P option). Be sure to follow the directions for 
 
     > brew install grep
@@ -240,5 +234,3 @@ echo ${machine}
 * platform configurations, maybe as a substitute for global configuration.
 * integrate a git-flow type of routine.
 * bash autocomplete
-
-
