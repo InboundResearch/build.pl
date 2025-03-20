@@ -1,3 +1,4 @@
 2018-10-12 - added "refresh-build" tool option, and moved "help" to be a tool.
 2018-11-19 - added "-Wno-psabi" to the root, and made the build.sh script check for perl/JSON.
 2019-01-09 - updated perl scripts to run in cygwin
+2025-03-18 - updates to support testing as a first-class citizen (not just implied), and to run with built-in JSON processing

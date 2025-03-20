@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
 scriptDir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)";
-$scriptDir/build.sh "$@"
+$scriptDir/build.bash "$@"

@@ -1,5 +1,6 @@
 use strict;
 use warnings FATAL => 'all';
+use Text::Balanced qw(extract_bracketed);
 
 # need JsonFile - the search lib path has already been adjusted by the calling perl script, so we
 # don't need to do that again here.
@@ -12,6 +13,35 @@ use Exporter qw(import);
 our @EXPORT = ();
 our @EXPORT_OK = qw(%ContextType reduce apply concatenate conf);
 
+my $debug = 0;
+sub dbg {
+    my ($output) = @_;
+    if ($debug) {
+        print STDERR $output;
+    }
+}
+
+# a function to call out to a shell with some conditioning on the command line
+sub sh {
+    my ($cmdString) = @_;
+    dbg "SH: $cmdString\n";
+    $cmdString =~ s/\$/_DOLLAR_/g;
+    my @cmd =split(m{\s+}, $cmdString);
+    my $output = `@cmd`;
+    $output =~ s/_DOLLAR_/\$/g;
+    chomp($output);
+    return $output;
+}
+
+# The exec_commands() function processes a string, finds all occurrences
+# of $( ... ) (even if embedded in a larger string) and replaces them
+# with the output of executing the command using sh
+sub exec_commands {
+    my ($s) = @_;
+    $s =~ s/\$\(((?:[^()\\]+|\\.|(?R))*)\)/sh($1)/eg;
+    return $s;
+}
+
 # given a value and a context, reduce the value as much as possible by performing replacements
 # XXX TODO - this needs to be a bit more fantastical
 sub replaceValues {
@@ -19,6 +49,8 @@ sub replaceValues {
 
     # do variable substitutions, .
     my $replacementCount;
+    dbg "replaceValues ($value)\n";
+
     do {
         $replacementCount = 0;
         # this list is reverse sorted so that variable names that are substrings of longer variable
@@ -26,17 +58,22 @@ sub replaceValues {
         # just too clever by half.
         my @variableNames = reverse sort $value =~ /\$([a-z][A-Za-z0-9]*)/g;
         for my $variableName (@variableNames) {
+            dbg "  Checking $variableName\n";
             if ((exists($context->{$variableName})) && ($context->{$variableName} ne "*")) {
+                dbg "    Replace $variableName with  " . $context->{$variableName} . "\n";
                 $value =~ s/\$$variableName/$context->{$variableName}/ge;
                 ++$replacementCount;
             }
         }
-    } while (0);#($replacementCount > 0);
+    #} while (0);#($replacementCount > 0);
+    } while ($replacementCount > 0);
 
     # do a substitution with a shell command if one is requested, until no more happen
-    while ($value =~ s/\$\(([^\)]*)\)/my $x = qx%$1%; chomp $x; $x/e) {}
+    dbg "  Pre-shell: $value\n";
+    $value = exec_commands ($value);
 
     # return the reduced value
+    dbg "  final: $value\n";
     return $value;
 }
 

@@ -4,13 +4,10 @@
 # to be a comprehensive make replacement, just a helper script to add a few other capabilities that
 # build.pl doesn't cover
 
-# ensure perl, and perl json
+# ensure perl
 if ! perl -v > /dev/null 2>&1; then
     echo "build requires a thread-enabled version of Perl."
     exit 1;
-fi
-if ! perl -MJSON -e 1 > /dev/null 2>&1; then
-    cpan JSON;
 fi
 
 # exit automatically if anything fails from here on out
@@ -65,6 +62,7 @@ echo "PROJECT: $PWD";
 shouldClean=0;
 shouldBuild=0;
 shouldRun=0;
+shouldTest=0;
 shouldPull=0;
 shouldPush=0;
 shouldDeploy=0;
@@ -76,6 +74,7 @@ allTargets=($(getcontextvars.pl targets));
 shouldTarget="";
 allConfigurations=($(getcontextvars.pl configurations));
 targetSeparator="";
+testPattern=$(getcontextvars.pl testPattern);
 
 # process the command line options. these cover a range of expected options (clean, build, run),
 # the ability to specify one or more values that match a target or configuration (which are not
@@ -86,8 +85,12 @@ if [ "$#" -gt 0 ]; then
     for target in "$@"; do
         #echo $COMMAND;
 
+        # check to see if this is referring to a valid target
+        #echo "${sourceDir[@]}";
+
         # command-line options are first checked to see if they are a valid target
         if [ -d "$sourceDir/$target" ]; then
+        #if false; then
             # ensure that we will build, then add the target to the shouldTarget list. the
             # separator is set so that subsequent targets get added to the list as a comma
             # separated list.
@@ -139,6 +142,9 @@ if [ "$#" -gt 0 ]; then
                     -run)
                         shouldRun=1;
                         ;;
+                    -test)
+                        shouldTest=1;
+                        ;;
                     -targets)
                         echo "Valid targets are: ${allTargets//,/, }";
                         exit 0;
@@ -159,8 +165,9 @@ if [ "$#" -gt 0 ]; then
         fi
     done
 else
-    # default to build and run in the default configuration (no clean)
+    # default to build, test, and run in the default configuration (no clean)
     shouldBuild=1;
+    shouldTest=1;
     shouldRun=1;
 fi
 
@@ -186,13 +193,13 @@ fi
 # after everything, if there is a build/run target...
 if [ "$shouldTarget" != "" ]; then
     # if build or run was requested, do that now...
-    if [ "$shouldBuild" -eq 1 ] || [ "$shouldRun" -eq 1 ]; then
+    if [ "$shouldBuild" -eq 1 ] || [ "$shouldRun" -eq 1 ] || [ "$shouldTest" -eq 1 ]; then
         # a little sanity check - check that one of the targets has source files
         IFS="," read -r -a targets <<< "$shouldTarget";
         sourceExtension=$(getcontextvars.pl sourceExtension);
         totalSourceCount=0;
         for target in "${targets[@]}"; do
-            sourceCount=$(ls -1 "$sourceDir/$target" 2> /dev/null | grep "$sourceExtension" | wc -l);
+            sourceCount=$(ls -1 "$target" 2> /dev/null | grep "$sourceExtension" | wc -l);
             totalSourceCount=$(($totalSourceCount + $sourceCount))
             #if [ "$sourceCount" -eq 0 ]; then
             #    echo "No sources in $target...";
@@ -209,44 +216,59 @@ if [ "$shouldTarget" != "" ]; then
     fi
 
     # if run was requested, do that now...
-    if [ "$shouldRun" -eq 1 ]; then
+    if [ "$shouldRun" -eq 1 ] || [ "$shouldTest" -eq 1 ]; then
         # linux and MacOS need to set the shared library path, we capture it like this so that we
         # don't make a really long load path when we are running multiple programs in sequence
         oldLibPath=$LD_LIBRARY_PATH;
         oldDyLibPath=$DYLD_LIBRARY_PATH;
 
-        # break the targets out into an array (it's a comma delimited string), and loop over them
-        # one by one
-        IFS="," read -r -a targets <<< "$shouldTarget";
-        for target in "${targets[@]}"; do
-            # then check to see if there is an executable in the target path
+        # helper function to run a target
+        run_target() {
+            local target="$1";
+            local runType="$2";
             targetPath="$targetDir/$target/$shouldConfiguration";
             if [ -x "$targetPath/$target" ]; then
-                echo "RUN: $targetPath/$target";
-                # go into the target directory - this makes the working directory the same as the
-                # executable directory, which simplifies some testing
+                echo "$runType: $targetPath/$target";
                 pushd "$targetPath" > /dev/null;
 
-                # set the shared library search path to include the full path of the working dir
+                # Update the library search paths
                 export LD_LIBRARY_PATH="$PWD:$oldLibPath";
                 export DYLD_LIBRARY_PATH="$PWD:$oldDyLibPath";
 
-                # we run the target, but we have to give it a path, because some built executables
-                # might look like system or shell commands without it (i.e. test)
-                echo;
+                echo
                 ./$target 2> >(tee "$target.stderr");
-                echo;
+                echo
 
-                # and go back to where we were...
                 popd > /dev/null;
-            fi
-        done
-    fi
+            fi;
+        }
+
+        # break the targets out into an array (it's a comma delimited string)
+        IFS="," read -r -a targets <<< "$shouldTarget";
+
+        # loop over the targets in two passes, test first, then run
+        for pass in "test" "run"; do
+            for target in "${targets[@]}"; do
+                # first check to see if the target is a test
+                isTest=$(perl -e "print ((\$ARGV[0] =~ /$testPattern/) ? 1 : 0)" "$target");
+
+                if [ "$pass" = "test" ] && (( isTest && shouldTest )); then
+                    run_target "$target" "TEST";
+                elif [ "$pass" = "run" ] && (( ! isTest && shouldRun )); then
+                    run_target "$target" "RUN";
+                fi;
+            done;
+        done;
+
+        # after processing targets, restore the original values (just to be sure)
+        export LD_LIBRARY_PATH="$oldLibPath";
+        export DYLD_LIBRARY_PATH="$oldDyLibPath";
+    fi;
 else
     # this shouldn't happen unless the user has deliberately configured an empty project
     echo "No target specified";
     exit 1;
-fi
+fi;
 
 # if push was requested, do that now...
 if [ "$shouldPush" -eq 1 ]; then

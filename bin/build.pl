@@ -40,7 +40,7 @@ Context::load ("project", ".");
 my $commandLineContext = {};
 foreach my $argument (@ARGV) {
     if ($argument =~ /^([^=]*)=([^=]*)$/) {
-        print STDERR "$1 = $2\n";
+        #print STDERR "$1 = $2\n";
         $commandLineContext->{$1} = $2;
     }
 }
@@ -60,34 +60,47 @@ Context::addTypeNamed("project", $ContextType{VALUES},
 #---------------------------------------------------------------------------------------------------
 my $targets = {};
 my $targetPrefix = "#";
-my $sourcePath = Context::confType ("project", $ContextType{VALUES}, "sourcePath");
+my $sourcePathString = Context::confType ("project", $ContextType{VALUES}, "sourcePath");
+my @sourcePaths = split(/,/, $sourcePathString);
 
-if (opendir(SOURCE_PATH, $sourcePath)) {
-	# cygwin abs_path fails if the file doesn't exist. we know the $target dir exists, but we're
-	# not sure about the context value for buildPath. We assemble the path manually and then call
-	# abs_path to normalize it if the path exists
-	my $buildPath = abs_path (".") . "/" . Context::confType ("project", $ContextType{VALUES}, "buildPath");
-	#print STDERR "PATHS to check ($buildPath)\n";
-	if (-e $buildPath) {
-		$buildPath = abs_path ($buildPath);
-	} else {
-        #print STDERR "WARNING, $buildPath does not exist.\n";
+# loop over the source paths
+for my $sourcePath  (@sourcePaths) {
+    if (opendir(SOURCE_PATH, $sourcePath)) {
+        # cygwin abs_path fails if the file doesn't exist. we know the $target dir exists, but we're
+        # not sure about the context value for buildPath. We assemble the path manually and then call
+        # abs_path to normalize it if the path exists
+        my $buildPath = abs_path (".") . "/" . Context::confType ("project", $ContextType{VALUES}, "buildPath");
+        #print STDERR "PATHS to check ($buildPath)\n";
+        if (-e $buildPath) {
+            $buildPath = abs_path ($buildPath);
+        }
+
+        while (my $target = readdir(SOURCE_PATH)) {
+            # skip unless $target is a non-hidden directory, that is not also the build directory
+            next unless (($target !~ /^\./) && (-d "$sourcePath/$target"));
+            next if (abs_path("$sourcePath/$target") eq $buildPath);
+
+            # compute the target path, and strip off a ./ at the beginning of the path
+            my $targetPath = "$sourcePath/$target";
+            $targetPath =~ s/^\.\///;
+
+            # load the target context to get the dependencies
+            Context::load ("$targetPrefix$target", "$targetPath/");
+            my $targetContext = Context::concatenateNamed ("project-" . $ContextType{VALUES}, "$targetPrefix$target-" . $ContextType{VALUES});
+            $targets->{$targetPath} = $targetContext;
+            #print STDERR "Gathered $targetPath\n";
+            #print STDERR "    With: " . join(", ", map { "$_ => $targetContext->{$_}" } sort keys %$targetContext) . "\n";
+        }
+        closedir(SOURCE_PATH);
     }
 
-    while (my $target = readdir(SOURCE_PATH)) {
-        # skip unless $target is a non-hidden directory, that is not also the build directory
-        next unless (($target !~ /^\./) && (-d "$sourcePath/$target"));
-        next if (abs_path("$sourcePath/$target") eq $buildPath);
-
-        # load the target context to get the dependencies
-        Context::load ("$targetPrefix$target", "$sourcePath/$target/");
-        my $targetContext = Context::concatenateNamed ("project-" . $ContextType{VALUES}, "$targetPrefix$target-" . $ContextType{VALUES});
-        $targets->{$target} = $targetContext;
+    # check if we got no targets at all
+    if (scalar keys %$targets == 0) {
+        my @items = split /,/, $sourcePathString;
+        $sourcePathString = join(', ', map { qq("$_") } @items);
+        print STDERR "No targets found in any of ($sourcePathString), $!\n";
+        exit ($!);
     }
-    closedir(SOURCE_PATH);
-} else {
-    print STDERR "Can't open source directory ($sourcePath), $!\n";
-    exit ($!);
 }
 
 #---------------------------------------------------------------------------------------------------
@@ -189,7 +202,7 @@ for my $target (@$targetsInDependencyOrder) {
 
             # reload the target context, concatenate it with the correct configuration contexts, then
             # the type contexts
-            Context::load("$targetPrefix$target", "$sourcePath/$target/");
+            Context::load("$targetPrefix$target", "$target/");
             my $targetContext = Context::concatenateNamed(
                 "project-" . $ContextType{VALUES},
                 "$targetPrefix$target-" . $ContextType{VALUES}
@@ -286,8 +299,7 @@ for my $target (@$targetsInDependencyOrder) {
                     }
                 }
                 closedir(SOURCE_TARGET_DIR);
-            }
-            else {
+            } else {
                 print STDERR "Can't open target source directory ($targetContext->{sourceFullPath}), $!\n";
                 exit ($!);
             }

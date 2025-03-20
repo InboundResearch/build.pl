@@ -88,6 +88,12 @@ see the github repository at https://github.com/brettonw/build.pl for details.
                         run flag implies -build. if any of the targets fails to
                         run, or returns EXIT_FAILURE, the build tool will exit.
 
+    -test               set a flag to run the test targets. this step is
+                        completed after all targets are successfully built.
+                        setting the test flag implies -build. if any of the test
+                        targets fails to run, or returns EXIT_FAILURE, the build
+                        tool will exit.
+
     -push               set a flag to run the project tool to push, or checkin,
                         sources to the source code management (SCM) system. the
                         push operation is performed after a successful build,

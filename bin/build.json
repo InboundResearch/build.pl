@@ -1,6 +1,7 @@
 {
     "values": {
         "sourcePath": ".",
+        "testPattern": "(?<=^|\\/)test-.+",
         "resourcesPath": "resources",
         "buildPath": "target",
         "objectsPath": "objects",
@@ -12,7 +13,7 @@
         "type": "application",
         "configuration": "debug",
         "verbose": 1,
-        "sourceFullPath": "$sourcePath/$target",
+        "sourceFullPath": "$(echo \"$sourcePath\" | sed 's/\\([^,][^,]*\\)/\\1\\/'\"$target\"'/g')",
         "resourcesFullPath": "$sourceFullPath/$resourcesPath",
         "outputPath": "$buildPath/$target/$configuration",
         "objectsFullPath": "$outputPath/$objectsPath",
