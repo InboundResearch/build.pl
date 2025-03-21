@@ -90,7 +90,6 @@ if [ "$#" -gt 0 ]; then
 
         # command-line options are first checked to see if they are a valid target
         if [ -d "$sourceDir/$target" ]; then
-        #if false; then
             # ensure that we will build, then add the target to the shouldTarget list. the
             # separator is set so that subsequent targets get added to the list as a comma
             # separated list.
@@ -213,6 +212,7 @@ if [ "$shouldTarget" != "" ]; then
         # all the targets have source files... let's build using build.pl
         #echo "BUILD.PL IS BEING RUN ON: $shouldTarget";
         build.pl target="$shouldTarget" configuration="$shouldConfiguration";
+        echo;
     fi
 
     # if run was requested, do that now...

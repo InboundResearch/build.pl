@@ -198,7 +198,7 @@ for my $target (@$targetsInDependencyOrder) {
     $configurationToBuild = (ref $configurationToBuild eq "ARRAY") ? $configurationToBuild : (($configurationToBuild ne "*") ? [ split(/[, ]+/, $configurationToBuild) ] : [ sort keys (%$configurations) ]);
     for my $configuration (@$configurationToBuild) {
         if (exists ($configurations->{$configuration})) {
-            print STDERR "BUILD: $target/$configuration\n";
+            print STDERR "\nBUILD: $target/$configuration\n";
 
             # reload the target context, concatenate it with the correct configuration contexts, then
             # the type contexts
